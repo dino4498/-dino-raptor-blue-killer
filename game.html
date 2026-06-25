@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Dino-Raptor-Blue-Killer 3D</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html,body { width:100%; height:100%; overflow:hidden; background:#05000f; color:#fbfbff; font-family:'Segoe UI',sans-serif; }
+#gameCanvas { display:block; width:100%; height:100%; }
+#hud { position:fixed; top:8px; left:8px; background:rgba(0,0,0,0.75); border:1px solid #ffd400; border-radius:8px; padding:6px 14px; font-size:13px; pointer-events:none; z-index:10; }
+#zoneLabel { position:fixed; top:8px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); border:1px solid #A1C9F4; border-radius:20px; padding:4px 20px; font-size:14px; font-weight:bold; pointer-events:none; z-index:10; }
+#minimap { position:fixed; top:8px; right:8px; z-index:10; pointer-events:none; }
+#minimapCanvas { background:rgba(0,0,0,0.85); border:1px solid #A1C9F4; border-radius:8px; }
+#controls { position:fixed; bottom:8px; right:8px; background:rgba(0,0,0,0.7); border:1px solid #444; border-radius:8px; padding:8px 10px; font-size:10px; color:#909094; pointer-events:none; z-index:10; line-height:1.8; }
+#chatBox { position:fixed; bottom:8px; left:8px; width:300px; background:rgba(0,0,0,0.88); border:1px solid #A1C9F4; border-radius:8px; z-index:10; }
+#chatLog { height:110px; overflow-y:auto; padding:6px 8px; font-size:11px; }
+#chatInputRow { display:flex; border-top:1px solid #333; }
+#chatInputRow input { flex:1; background:transparent; border:none; color:#fbfbff; padding:5px 8px; font-size:12px; outline:none; }
+#chatInputRow button { background:#ffd400; color:#05000f; border:none; padding:5px 10px; cursor:pointer; font-weight:bold; border-radius:0 0 8px 0; }
+#powerBar { position:fixed; top:50px; left:8px; display:none; z-index:10; }
+#powerBar button { display:block; margin-bottom:4px; background:rgba(255,212,0,0.18); border:1px solid #ffd400; color:#ffd400; padding:5px 14px; border-radius:6px; cursor:pointer; font-size:11px; }
+#powerBar button:hover { background:#ffd400; color:#05000f; }
+#interactHint { position:fixed; bottom:160px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); border:1px solid #8DE5A1; border-radius:20px; padding:5px 20px; font-size:13px; display:none; z-index:10; pointer-events:none; color:#8DE5A1; }
+#dialogBox { position:fixed; bottom:170px; left:50%; transform:translateX(-50%); background:#0d0d1a; border:2px solid #ffd400; border-radius:12px; padding:16px 22px; max-width:420px; width:90%; display:none; z-index:50; }
+#dialogBox .speaker { color:#ffd400; font-weight:bold; margin-bottom:6px; font-size:14px; }
+#dialogBox .text { color:#fbfbff; font-size:13px; line-height:1.6; }
+#dialogBox button { margin-top:10px; background:#ffd400; color:#05000f; border:none; padding:5px 18px; border-radius:6px; cursor:pointer; font-weight:bold; }
+#actionMenu { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#0d0d1a; border:2px solid #A1C9F4; border-radius:12px; padding:18px; width:320px; display:none; z-index:100; }
+#actionMenu h3 { color:#A1C9F4; margin-bottom:12px; text-align:center; }
+.action-btn { display:block; width:100%; padding:8px; border:none; border-radius:8px; cursor:pointer; font-size:13px; font-weight:bold; margin-bottom:6px; background:#1a1a2e; color:#fbfbff; border:1px solid #333; text-align:left; }
+.action-btn:hover { background:#2a2a4e; border-color:#A1C9F4; }
+#roomMenu { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#0d0d1a; border:2px solid #ffd400; border-radius:12px; padding:18px; width:380px; display:none; z-index:100; }
+#roomMenu h3 { color:#ffd400; margin-bottom:10px; text-align:center; }
+#roomMenu input, #roomMenu select { width:100%; background:#1a1a2e; border:1px solid #555; color:#fbfbff; padding:7px; border-radius:6px; margin-bottom:7px; font-size:12px; }
+#roomMenu button { width:100%; padding:8px; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold; margin-bottom:6px; }
+.btn-gold { background:#ffd400; color:#05000f; }
+.btn-red { background:#f04438; color:#fff; }
+.btn-blue { background:#1F77B4; color:#fff; }
+#codePopup { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#0d0d1a; border:2px solid #8DE5A1; border-radius:12px; padding:24px; text-align:center; display:none; z-index:150; }
+#codePopup .bigCode { font-size:2.6em; color:#ffd400; font-weight:bold; letter-spacing:10px; margin:14px 0; }
+#codePopup button { background:#8DE5A1; color:#05000f; border:none; padding:8px 22px; border-radius:8px; cursor:pointer; font-weight:bold; }
+#overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg,#05000f 0%,#0d0020 50%,#050010 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:200; overflow-y:auto; }
+#overlay h1 { font-size:2.8em; color:#ffd400; text-shadow:0 0 40px #ffd400; margin-bottom:8px; text-align:center; letter-spacing:2px; }
+.subtitle { color:#A1C9F4; font-size:1.05em; margin-bottom:20px; text-align:center; }
+.form-group { margin-bottom:12px; width:340px; }
+.form-group label { display:block; margin-bottom:5px; color:#A1C9F4; font-size:12px; text-transform:uppercase; letter-spacing:1px; }
+.form-group input, .form-group select { width:100%; background:#1a1a2e; border:1px solid #555; color:#fbfbff; padding:10px; border-radius:8px; font-size:14px; }
+.char-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; width:500px; margin-bottom:16px; }
+.char-card { background:#1a1a2e; border:2px solid #333; border-radius:10px; padding:10px 6px; text-align:center; cursor:pointer; transition:all 0.2s; }
+.char-card:hover, .char-card.selected { border-color:#ffd400; background:#2a2a3e; transform:scale(1.06); }
+.char-emoji { font-size:2em; }
+.char-name { font-size:10px; margin-top:4px; color:#A1C9F4; }
+.creator-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; width:500px; background:#1a1a2e; border:1px solid #444; border-radius:10px; padding:14px; margin-bottom:14px; }
+.big-btn { background:linear-gradient(135deg,#ffd400,#ff8c00); color:#05000f; border:none; padding:14px 40px; border-radius:12px; font-size:1.15em; font-weight:bold; cursor:pointer; margin-top:8px; }
+#crosshair { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:5; display:none; width:20px; height:20px; }
+#crosshair::before { content:""; position:absolute; width:20px; height:2px; background:#fff; opacity:0.7; top:9px; left:0; }
+#crosshair::after { content:""; position:absolute; width:2px; height:20px; background:#fff; opacity:0.7; top:0; left:9px; }
+#fps { position:fixed; bottom:8px; left:50%; transform:translateX(-50%); color:#444; font-size:10px; pointer-events:none; z-index:10; }
+#floorIndicator { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.9); border:2px solid #A1C9F4; border-radius:10px; padding:12px 24px; font-size:1.2em; color:#A1C9F4; display:none; z-index:20; pointer-events:none; }
+</style>
+</head>
+<body>
+<div id="overlay">
+  <div id="ageScreen" style="display:flex;flex-direction:column;align-items:center;">
+    <h1>DINO-RAPTOR-BLUE-KILLER</h1>
+    <p class="subtitle">The Amazing Digital Circus - 3D Online World</p>
+    <div class="form-group"><label>Your Age</label><input type="number" id="ageInput" placeholder="How old are you?" min="1" max="120"></div>
+    <div id="ageError" style="color:#f04438;font-size:12px;margin-bottom:8px;display:none;">You must be 13 or older!</div>
+    <button class="big-btn" onclick="checkAge()">ENTER THE CIRCUS</button>
+  </div>
+  <div id="charScreen" style="display:none;flex-direction:column;align-items:center;">
+    <h1 style="font-size:2em;margin-bottom:6px;">Choose Your Character</h1>
+    <p class="subtitle">Pick one or create your own!</p>
+    <div class="char-grid" id="charGrid"></div>
+    <div class="creator-grid">
+      <div class="form-group" style="margin:0;"><label>Name</label><input type="text" id="customName" placeholder="Your name..."></div>
+      <div class="form-group" style="margin:0;"><label>Gender</label><select id="customGender"><option value="male">Boy</option><option value="female">Girl</option><option value="nonbinary">Non-binary</option></select></div>
+      <div class="form-group" style="margin:0;"><label>Skin</label><select id="customSkin"><option value="FDBCB4">Light</option><option value="E8956D">Medium</option><option value="8D5524">Dark</option><option value="7EC8E3">Blue</option><option value="FFD700">Gold</option></select></div>
+      <div class="form-group" style="margin:0;"><label>Hair</label><select id="customHair"><option value="111111">Black</option><option value="FFD700">Gold</option><option value="8B0000">Red</option><option value="4169E1">Blue</option><option value="9400D3">Purple</option><option value="FF69B4">Pink</option></select></div>
+    </div>
+    <button class="big-btn" onclick="startGame()">PLAY NOW!</button>
+  </div>
+</div>
+<canvas id="gameCanvas"></canvas>
+<div id="crosshair"></div>
+<div id="hud"><span id="hudName">Player</span> | <span id="hudZone">Main Hall</span> | <span id="hudFloor">Floor 1</span> | <span id="hudPlayers">4 online</span></div>
+<div id="zoneLabel">MAIN HALL</div>
+<div id="floorIndicator"></div>
+<div id="minimap"><canvas id="minimapCanvas" width="130" height="90"></canvas><div style="font-size:9px;color:#909094;text-align:center;margin-top:2px;" id="mmLabel">Main Hall</div></div>
+<div id="powerBar">
+  <button onclick="toggleFly()">FLY [F]</button>
+  <button onclick="doTP()">TP [T]</button>
+  <button onclick="togglePhase()">PHASE [P]</button>
+  <button onclick="doReality()">SHIFT [R]</button>
+</div>
+<div id="interactHint">Press E to talk</div>
+<div id="dialogBox">
+  <div class="speaker" id="dialogSpeaker"></div>
+  <div class="text" id="dialogText"></div>
+  <button onclick="closeDialog()">Continue</button>
+</div>
+<div id="actionMenu">
+  <h3>Room Actions</h3>
+  <button class="action-btn" onclick="doAction('sleep')">Sleep</button>
+  <button class="action-btn" onclick="doAction('eat')">Eat</button>
+  <button class="action-btn" onclick="doAction('drink')">Drink water</button>
+  <button class="action-btn" onclick="doAction('alcohol')">Drink alcohol</button>
+  <button class="action-btn" onclick="doAction('smoke')">Smoke</button>
+  <button class="action-btn" onclick="doAction('vape')">Vape</button>
+  <button class="action-btn" onclick="doAction('pc')">Play on PC</button>
+  <button class="action-btn" onclick="doAction('ps5')">Play on PS5</button>
+  <button class="action-btn" onclick="doAction('laptop')">Chat on Laptop</button>
+  <button class="action-btn" onclick="doAction('phone')">Use Phone</button>
+  <button class="action-btn" onclick="doAction('shower')">Take a shower</button>
+  <button class="action-btn" onclick="doAction('gun')">Hold gun</button>
+  <button class="action-btn" onclick="doAction('lock')">Lock room</button>
+  <button class="action-btn btn-red" onclick="closeActionMenu()">Close</button>
+</div>
+<div id="roomMenu">
+  <h3>Multiplayer Rooms</h3>
+  <div id="roomList"></div>
+  <hr style="border-color:#333;margin:8px 0;">
+  <input type="text" id="newRoomName" placeholder="Room name...">
+  <label style="color:#A1C9F4;font-size:12px;display:flex;align-items:center;gap:6px;margin-bottom:8px;"><input type="checkbox" id="privateRoom"> Private room (with code)</label>
+  <button class="btn-gold" onclick="createRoom()">Create Room</button>
+  <input type="text" id="joinCode" placeholder="Join with code (6 chars)...">
+  <button class="btn-blue" onclick="joinWithCode()">Join with Code</button>
+  <button class="btn-red" onclick="document.getElementById('roomMenu').style.display='none';roomMenuOpen=false;">Close</button>
+</div>
+<div id="codePopup">
+  <h3 style="color:#8DE5A1;">Your Private Code</h3>
+  <p style="color:#A1C9F4;font-size:12px;">Share only with friends!</p>
+  <div class="bigCode" id="generatedCode">XXXXXX</div>
+  <button onclick="document.getElementById('codePopup').style.display='none'">Got it!</button>
+</div>
+<div id="chatBox">
+  <div id="chatLog"></div>
+  <div id="chatInputRow">
+    <input type="text" id="chatMsg" placeholder="Chat (Enter to send)" maxlength="120" onkeydown="if(event.key==='Enter'){event.stopPropagation();sendChat();}">
+    <button onclick="sendChat()">Send</button>
+  </div>
+</div>
+<div id="controls">WASD = Move | Mouse = Look<br>SPACE = Jump | E = Talk<br>H = Actions | M = Rooms<br>Q = Floor up | Z = Floor down<br>F=Fly T=TP P=Phase R=Shift<br>Tab = Chat | Esc = Unlock mouse</div>
+<div id="fps"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+var CHARS=[
+  {id:"dino_raptor",name:"Dino Raptor",emoji:"DR",color:0xFFD700,skinColor:0xFFD700,female:false,leader:true,bodyColor:0x8B0000,hairColor:0x4B0082},
+  {id:"pomni",name:"Pomni",emoji:"PO",color:0x4169E1,skinColor:0xFDBCB4,female:true,leader:false,bodyColor:0x1a3aff,hairColor:0x4169E1},
+  {id:"ragatha",name:"Ragatha",emoji:"RA",color:0xFF69B4,skinColor:0xFFB6C1,female:true,leader:false,bodyColor:0xFF69B4,hairColor:0xFF1493},
+  {id:"jax",name:"Jax",emoji:"JX",color:0x9B59B6,skinColor:0xE8D5B7,female:false,leader:false,bodyColor:0x6C3483,hairColor:0x2C3E50},
+  {id:"gangle",name:"Gangle",emoji:"GG",color:0xE74C3C,skinColor:0xFDBCB4,female:true,leader:false,bodyColor:0xC0392B,hairColor:0x8B0000},
+  {id:"zooble",name:"Zooble",emoji:"ZB",color:0x27AE60,skinColor:0x7DCEA0,female:true,leader:false,bodyColor:0x27AE60,hairColor:0x1E8449},
+  {id:"kinger",name:"Kinger",emoji:"KG",color:0xF39C12,skinColor:0xE8D5B7,female:false,leader:false,bodyColor:0xD4AC0D,hairColor:0x784212},
+  {id:"bubble",name:"Bubble",emoji:"BB",color:0x85C1E9,skinColor:0xAED6F1,female:false,leader:false,bodyColor:0x5DADE2,hairColor:0x2E86C1}
+];
+var DIALOGS={
+  pomni:["I need to find a way out of here...","Everything is so terrifying!","Please don't leave me alone!"],
+  ragatha:["Hi! Want to be friends?","I'm sure things will get better!","Stay positive, okay?"],
+  jax:["Ugh, seriously?","Whatever. I don't care.","You're kind of interesting... for a nobody."],
+  gangle:["*crying softly*","I just want to feel happy again...","My ribbons are tangled again..."],
+  zooble:["Don't touch me.","I'm fine. Go away.","...Okay fine. What do you want?"],
+  kinger:["THEY ARE WATCHING US!","Chess is the only truth!","Is that a spy? ARE YOU A SPY?"],
+  bubble:["Bubble!","...Bubble?","BUBBLE!"],
+  npc_guard:["Halt! This area is secure.","Move along.","Keep the peace."],
+  npc_vendor:["Get your cotton candy!","Fresh snacks!","Best prices in the digital world!"],
+  npc_clown:["HONK HONK!","Want to see a trick?","Why so serious? HONK!"]
+};
+var FLOOR_OFFSETS=[
+  {x:-30,z:0,y:0,name:"Basement/Dungeon"},
+  {x:0,z:0,y:0,name:"Main Hall"},
+  {x:30,z:0,y:0,name:"Bedrooms"},
+  {x:60,z:0,y:0,name:"Rooftop"}
+];
+var player={x:0,y:2,z:0,name:"Player",charId:"pomni",isLeader:false,flying:false,phasing:false,gender:"male"};
+var cam={yaw:0,pitch:0};
+var keys={};
+var chatOpen=false,dialogOpen=false,actionOpen=false,roomMenuOpen=false;
+var nearNPC=null,selectedChar=null,gameStarted=false;
+var lastTime=0,fpsCount=0,fpsTime=0,fps=0;
+var playerVelY=0,onGround=false,flying=false,phasing=false;
+var currentFloorIdx=1;
+var playerMesh=null;
+
+var canvas3d=document.getElementById("gameCanvas");
+var renderer=new THREE.WebGLRenderer({canvas:canvas3d,antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.setSize(window.innerWidth,window.innerHeight);
+var scene=new THREE.Scene();
+scene.background=new THREE.Color(0x040010);
+scene.fog=new THREE.Fog(0x040010,20,80);
+var camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,200);
+camera.position.set(0,2.5,0);
+window.addEventListener("resize",function(){
+  camera.aspect=window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth,window.innerHeight);
+});
+
+scene.add(new THREE.AmbientLight(0x220044,0.8));
+var dirL=new THREE.DirectionalLight(0xffd400,1.2);
+dirL.position.set(5,10,5);dirL.castShadow=true;scene.add(dirL);
+var ptL1=new THREE.PointLight(0xffd400,1.5,30);ptL1.position.set(0,5,0);scene.add(ptL1);
+var ptL2=new THREE.PointLight(0x9b59b6,1.0,20);ptL2.position.set(-8,4,-8);scene.add(ptL2);
+
+var MAT={
+  gold:new THREE.MeshStandardMaterial({color:0xffd400,metalness:0.8,roughness:0.2}),
+  dark:new THREE.MeshStandardMaterial({color:0x0d0020,roughness:0.9}),
+  stone:new THREE.MeshStandardMaterial({color:0x444466,roughness:0.8}),
+  carpet:new THREE.MeshStandardMaterial({color:0x8B0000,roughness:1.0}),
+  wood:new THREE.MeshStandardMaterial({color:0x5C3317,roughness:0.9}),
+  glowing:new THREE.MeshStandardMaterial({color:0x9b59b6,emissive:0x4a0080,emissiveIntensity:0.8}),
+  screen:new THREE.MeshStandardMaterial({color:0x001133,emissive:0x002266,emissiveIntensity:1.0}),
+  white:new THREE.MeshStandardMaterial({color:0xffffff}),
+  neon_blue:new THREE.MeshStandardMaterial({color:0x00ccff,emissive:0x0066ff,emissiveIntensity:1.2}),
+  neon_pink:new THREE.MeshStandardMaterial({color:0xff66ff,emissive:0x990066,emissiveIntensity:1.0}),
+  glass:new THREE.MeshStandardMaterial({color:0x88ccff,transparent:true,opacity:0.3,roughness:0.1})
+};
+
+function mkMat(c){return new THREE.MeshStandardMaterial({color:c,roughness:0.8});}
+function box(w,h,d,mat,x,y,z){
+  var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+  m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;
+}
+function cyl(rt,rb,h,seg,mat,x,y,z){
+  var m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),mat);
+  m.position.set(x,y,z);m.castShadow=true;scene.add(m);return m;
+}
+function sph(r,seg,mat,x,y,z){
+  var m=new THREE.Mesh(new THREE.SphereGeometry(r,seg,seg),mat);
+  m.position.set(x,y,z);m.castShadow=true;scene.add(m);return m;
+}
+
+function buildWorld(){
+  buildRoom(-30,0,"dungeon",0x1a1000,0x331100,0x5C3317);
+  buildRoom(0,0,"main_hall",0x0d0020,0x220033,0x444466);
+  buildRoom(30,0,"bedrooms",0x100020,0x200040,0x333355);
+  buildRoom(60,0,"rooftop",0x000010,0x000022,0x222244);
+  for(var i=0;i<4;i++){
+    for(var s=0;s<6;s++){
+      box(2,0.3,1,MAT.stone,i*30+12,s*0.5+0.25,-8+s*0.5);
+    }
+  }
+}
+
+function buildRoom(ox,oz,type,fc,wc,ac){
+  var fm=mkMat(fc),wm=mkMat(wc),am=mkMat(ac);
+  var W=28,H=6,D=28;
+  box(W,0.3,D,fm,ox,0,oz);
+  box(W,0.3,D,wm,ox,H,oz);
+  box(0.3,H,D,wm,ox-W/2,H/2,oz);
+  box(0.3,H,D,wm,ox+W/2,H/2,oz);
+  box(W,H,0.3,wm,ox,H/2,oz-D/2);
+  box(W,H,0.3,wm,ox,H/2,oz+D/2);
+  var nm=new THREE.MeshStandardMaterial({color:ac,emissive:ac,emissiveIntensity:0.6});
+  box(W,0.1,0.1,nm,ox,0.2,oz-D/2);
+  box(W,0.1,0.1,nm,ox,0.2,oz+D/2);
+  box(0.1,0.1,D,nm,ox-W/2,0.2,oz);
+  box(0.1,0.1,D,nm,ox+W/2,0.2,oz);
+  if(type==="main_hall") buildMainHall(ox,oz,am);
+  if(type==="bedrooms")  buildBedrooms(ox,oz,am);
+  if(type==="dungeon")   buildDungeon(ox,oz);
+  if(type==="rooftop")   buildRooftop(ox,oz,am);
+}
+
+function buildMainHall(ox,oz,am){
+  box(3,0.4,2,MAT.gold,ox,0.2,oz-10);
+  box(3,3,0.4,MAT.gold,ox,1.7,oz-11);
+  box(0.8,3,2,MAT.gold,ox-1.6,1.7,oz-10);
+  box(0.8,3,2,MAT.gold,ox+1.6,1.7,oz-10);
+  box(2,0.05,12,MAT.carpet,ox,0.18,oz-4);
+  for(var i=-1;i<=1;i++){
+    box(2.8,1.8,0.12,MAT.screen,ox+i*3,3.2,oz+10);
+  }
+  box(0.8,1.8,0.6,am,ox-6,0.9,oz+10.2);
+  box(0.8,0.1,0.6,MAT.neon_blue,ox-6,1.8,oz+10.2);
+  box(1.8,0.1,0.6,MAT.stone,ox,2.2,oz+10.6);
+  box(1.6,0.08,1.2,MAT.dark,ox+6,2.28,oz+10.4);
+  box(1.6,1.2,0.06,MAT.screen,ox+6,2.9,oz+9.9);
+  box(10,0.2,2,MAT.wood,ox,2.1,oz+10.5);
+  box(0.2,2.1,2,MAT.wood,ox-5,1.0,oz+10.5);
+  box(0.2,2.1,2,MAT.wood,ox+5,1.0,oz+10.5);
+  box(3,0.6,4,mkMat(0x1a1a5e),ox-9,0.3,oz-4);
+  box(3,0.12,4,new THREE.MeshStandardMaterial({color:0x4444aa,emissive:0x2222ff,emissiveIntensity:0.5}),ox-9,0.62,oz-4);
+  box(3,1.4,0.3,MAT.gold,ox-9,1.0,oz-6);
+  box(3.2,0.05,4.2,MAT.neon_blue,ox-9,0.01,oz-4);
+  box(0.5,1.2,0.18,MAT.white,ox-9,0.9,oz+9);
+  for(var s2=-1;s2<=1;s2+=2){
+    cyl(0.3,0.35,6,8,MAT.gold,ox+s2*10,3,oz);
+    sph(0.4,8,MAT.gold,ox+s2*10,6.2,oz);
+  }
+  var rm=new THREE.MeshStandardMaterial({color:0x9b59b6,emissive:0x4a0080,emissiveIntensity:1.2});
+  for(var ri=0;ri<4;ri++) box(0.8,0.8,0.05,rm,ox-13+ri*2.5,3.5,oz-13.8);
+}
+
+function buildBedrooms(ox,oz,am){
+  box(2.5,0.5,3.5,mkMat(0x00008B),ox-9,0.25,oz-4);
+  box(2.5,0.1,3.5,new THREE.MeshStandardMaterial({color:0x1a1aff,emissive:0x0000ff,emissiveIntensity:0.4}),ox-9,0.56,oz-4);
+  box(2.4,0.2,1.0,MAT.wood,ox-9,2.1,oz+5);
+  box(1.8,1.4,0.1,MAT.screen,ox-9,3.0,oz+4.55);
+  box(2.5,0.5,3.5,mkMat(0x8B0038),ox+9,0.25,oz-4);
+  box(2.5,0.1,3.5,new THREE.MeshStandardMaterial({color:0xff69b4,emissive:0xff1493,emissiveIntensity:0.4}),ox+9,0.56,oz-4);
+  box(4,0.5,5,mkMat(0x440000),ox,0.25,oz-7);
+  box(4,0.1,5,MAT.carpet,ox,0.56,oz-7);
+  box(4,1.5,0.2,MAT.gold,ox,1.0,oz-9.6);
+  sph(0.4,8,MAT.gold,ox,4.5,oz-13.8);
+  var bx=ox+9,bz=oz+8;
+  box(5,0.3,5,mkMat(0xddddff),bx,0.15,bz);
+  box(2,3,2,MAT.glass,bx+1.5,1.5,bz+1.5);
+  cyl(0.5,0.5,0.6,12,MAT.white,bx-2,0.3,bz+1.5);
+  box(1.2,0.8,1,MAT.white,bx-2,0.7,bz+2);
+  box(1.2,0.15,0.8,MAT.white,bx-2,2.1,bz-1.5);
+  box(0.15,5,6,MAT.stone,ox,2.5,oz+3);
+}
+
+function buildDungeon(ox,oz){
+  var vpm=new THREE.MeshStandardMaterial({color:0x4a0080,emissive:0x9b59b6,emissiveIntensity:2.0,transparent:true,opacity:0.85});
+  cyl(3,3,0.2,32,vpm,ox+6,0.2,oz+6);
+  for(var a=0;a<8;a++){
+    var ang=a*(Math.PI*2/8);
+    sph(0.2,8,MAT.glowing,ox+6+Math.cos(ang)*3.5,0.4,oz+6+Math.sin(ang)*3.5);
+  }
+  for(var ti=0;ti<2;ti++){
+    for(var tj=0;tj<2;tj++){
+      var tx=(ti*2-1)*8,tz=(tj*2-1)*8;
+      var tm=new THREE.MeshStandardMaterial({color:0xff6600,emissive:0xff3300,emissiveIntensity:2.0});
+      cyl(0.1,0.08,0.6,8,tm,ox+tx,3,oz+tz);
+      var tl=new THREE.PointLight(0xff4400,1.5,8);
+      tl.position.set(ox+tx,3.5,oz+tz);scene.add(tl);
+    }
+  }
+  for(var b=0;b<6;b++) box(1.5,1.5,1.5,MAT.wood,ox-8+b*2.5,0.75,oz+8);
+}
+
+function buildRooftop(ox,oz,am){
+  cyl(0.2,0.3,2,12,MAT.stone,ox-5,1,oz-5);
+  cyl(0.18,0.12,1.5,12,am,ox-5,2.75,oz-5);
+  for(var s=0;s<20;s++){
+    var sm=new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:2.0});
+    sph(0.08+Math.random()*0.12,6,sm,ox+(Math.random()-0.5)*25,8+Math.random()*8,oz+(Math.random()-0.5)*25);
+  }
+  sph(2,16,mkMat(0xddddaa),ox+8,12,oz-10);
+  var ml=new THREE.PointLight(0xaaccff,1.0,30);ml.position.set(ox+8,12,oz-10);scene.add(ml);
+  var cols=[0xff00ff,0x9b59b6,0x00ffff];
+  for(var ni=0;ni<3;ni++){
+    var snm=new THREE.MeshStandardMaterial({color:cols[ni],emissive:cols[ni],emissiveIntensity:1.5});
+    box(3,0.6,0.15,snm,ox-6+ni*6,4,oz-13.8);
+  }
+  for(var fi=0;fi<14;fi++){
+    box(0.1,1.2,0.1,MAT.stone,ox-13+fi*2,0.6,oz-14);
+    box(0.1,1.2,0.1,MAT.stone,ox-13+fi*2,0.6,oz+14);
+  }
+  box(28,0.1,0.1,MAT.neon_blue,ox,1.2,oz-14);
+  box(28,0.1,0.1,MAT.neon_blue,ox,1.2,oz+14);
+}
+
+buildWorld();
+
+var skyMat=new THREE.MeshStandardMaterial({color:0x040010,side:THREE.BackSide,emissive:0x080020,emissiveIntensity:0.3});
+scene.add(new THREE.Mesh(new THREE.SphereGeometry(150,32,16),skyMat));
+var sg=new THREE.BufferGeometry();
+var sv=[];
+for(var si=0;si<2000;si++){
+  var st=Math.random()*Math.PI*2,sp=Math.acos(2*Math.random()-1),sr=120+Math.random()*20;
+  sv.push(sr*Math.sin(sp)*Math.cos(st),sr*Math.sin(sp)*Math.sin(st),sr*Math.cos(sp));
+}
+sg.setAttribute("position",new THREE.Float32BufferAttribute(sv,3));
+scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:0.3})));
+
+function buildChar(data,isPlayer){
+  var g=new THREE.Group();
+  var bc=data.bodyColor||0x4169E1,sc=data.skinColor||0xFDBCB4,hc=data.hairColor||0x111111;
+  var bm=mkMat(bc),sm2=mkMat(sc),hm=mkMat(hc);
+  var em=new THREE.MeshStandardMaterial({color:0xffffff,emissive:0xffffff,emissiveIntensity:0.5});
+  var pm=mkMat(0x000000);
+  var gm=new THREE.MeshStandardMaterial({color:0xFFD700,metalness:0.9,roughness:0.1});
+
+  if(data.id==="bubble"){
+    var bubm=new THREE.MeshStandardMaterial({color:0x85C1E9,transparent:true,opacity:0.6,metalness:0.2,roughness:0.1});
+    var bub=new THREE.Mesh(new THREE.SphereGeometry(0.6,24,24),bubm);
+    bub.position.y=1.2;g.add(bub);
+  } else {
+    var torso=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.85,0.45),bm);
+    torso.position.y=1.0;g.add(torso);
+    for(var ls=-1;ls<=1;ls+=2){
+      var leg=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.7,0.28),bm);
+      leg.position.set(ls*0.2,0.35,0);g.add(leg);
+      var shoe=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.15,0.38),mkMat(0x111111));
+      shoe.position.set(ls*0.2,0.0,0.05);g.add(shoe);
+      var arm=new THREE.Mesh(new THREE.BoxGeometry(0.22,0.65,0.22),bm);
+      arm.position.set(ls*0.5,1.0,0);g.add(arm);
+      var hand=new THREE.Mesh(new THREE.SphereGeometry(0.14,8,8),sm2);
+      hand.position.set(ls*0.5,0.65,0);g.add(hand);
+    }
+    var hs=data.id==="kinger"?0.55:0.48;
+    var head=new THREE.Mesh(new THREE.BoxGeometry(hs,hs,hs),sm2);
+    head.position.y=1.7;g.add(head);
+    for(var es=-1;es<=1;es+=2){
+      var eye=new THREE.Mesh(new THREE.SphereGeometry(0.08,8,8),em);
+      eye.position.set(es*0.13,1.74,0.24);g.add(eye);
+      var pup=new THREE.Mesh(new THREE.SphereGeometry(0.04,6,6),pm);
+      pup.position.set(es*0.13,1.74,0.28);g.add(pup);
+    }
+    var hair=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.2,0.52),hm);
+    hair.position.y=1.98;g.add(hair);
+
+    if(data.id==="dino_raptor"){
+      for(var ci=-2;ci<=2;ci++){
+        var pk=new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.08,0.18+Math.abs(ci)*0.06,6),gm);
+        pk.position.set(ci*0.08,2.22,0);g.add(pk);
+      }
+      for(var ws=-1;ws<=1;ws+=2){
+        var wm2=new THREE.MeshStandardMaterial({color:0x4B0082,transparent:true,opacity:0.85,side:THREE.DoubleSide});
+        var wing=new THREE.Mesh(new THREE.ConeGeometry(0.8,1.2,4),wm2);
+        wing.position.set(ws*0.95,1.1,0);wing.rotation.z=ws*0.8;wing.rotation.y=ws*0.3;g.add(wing);
+        var gel=new THREE.Mesh(new THREE.SphereGeometry(0.09,8,8),new THREE.MeshStandardMaterial({color:0xffd400,emissive:0xffd400,emissiveIntensity:3.0}));
+        gel.position.set(ws*0.13,1.74,0.29);g.add(gel);
+      }
+      var aurM=new THREE.MeshStandardMaterial({color:0xffd400,emissive:0xffd400,emissiveIntensity:1.5,transparent:true,opacity:0.5,side:THREE.DoubleSide});
+      var aur=new THREE.Mesh(new THREE.TorusGeometry(0.9,0.04,8,32),aurM);
+      aur.position.y=1.0;aur.rotation.x=Math.PI/2;g.add(aur);
+      g.userData.auraRing=aur;
+    }
+    if(data.id==="pomni"){
+      for(var ps=-1;ps<=1;ps+=2){
+        var jpm=mkMat(ps>0?0x1a3aff:0xff2222);
+        var jpk=new THREE.Mesh(new THREE.ConeGeometry(0.2,0.55,8),jpm);
+        jpk.position.set(ps*0.18,2.35,0);jpk.rotation.z=ps*0.4;g.add(jpk);
+      }
+    }
+    if(data.id==="kinger"){
+      var kc=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.32,0.35,12),gm);
+      kc.position.y=2.1;g.add(kc);
+    }
+    if(data.id==="jax"){
+      for(var js=-1;js<=1;js+=2){
+        var er=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.09,0.7,8),mkMat(0x6C3483));
+        er.position.set(js*0.15,2.4,0);g.add(er);
+      }
+    }
+    if(data.female){
+      var brL=null,brR=null;
+      for(var bs=-1;bs<=1;bs+=2){
+        var brm=mkMat(sc);
+        var br=new THREE.Mesh(new THREE.SphereGeometry(0.14,12,12),brm);
+        br.position.set(bs*0.17,1.08,0.3);g.add(br);
+        if(bs===-1)brL=br;else brR=br;
+      }
+      g.userData.breastL=brL;
+      g.userData.breastR=brR;
+      g.userData.breastVelY=0;
+      g.userData.breastVelX=0;
+      g.userData.prevMX=0;
+      g.userData.prevMZ=0;
+    }
+  }
+
+  var lc2=document.createElement("canvas");
+  lc2.width=256;lc2.height=64;
+  var lctx=lc2.getContext("2d");
+  lctx.fillStyle="rgba(0,0,0,0.6)";lctx.fillRect(4,4,248,56);
+  lctx.font="bold 26px sans-serif";
+  lctx.fillStyle=data.leader?"#ffd400":"#ffffff";
+  lctx.textAlign="center";
+  lctx.fillText(data.name,128,40);
+  var ltex=new THREE.CanvasTexture(lc2);
+  var lsp=new THREE.Sprite(new THREE.SpriteMaterial({map:ltex,transparent:true}));
+  lsp.scale.set(2.2,0.55,1);lsp.position.y=2.8;g.add(lsp);
+  g.userData.label=lsp;
+  g.userData.floating=data.id==="bubble";
+  g.userData.floatAngle=Math.random()*Math.PI*2;
+  g.userData.auraAngle=0;
+  g.userData.data=data;
+  return g;
+}
+
+var npcDefs=[
+  {id:"pomni",name:"Pomni",bodyColor:0x1a3aff,skinColor:0xFDBCB4,hairColor:0x4169E1,female:true,leader:false},
+  {id:"ragatha",name:"Ragatha",bodyColor:0xFF69B4,skinColor:0xFFB6C1,hairColor:0xFF1493,female:true,leader:false},
+  {id:"jax",name:"Jax",bodyColor:0x6C3483,skinColor:0xE8D5B7,hairColor:0x2C3E50,female:false,leader:false},
+  {id:"gangle",name:"Gangle",bodyColor:0xC0392B,skinColor:0xFDBCB4,hairColor:0x8B0000,female:true,leader:false},
+  {id:"zooble",name:"Zooble",bodyColor:0x27AE60,skinColor:0x7DCEA0,hairColor:0x1E8449,female:true,leader:false},
+  {id:"kinger",name:"Kinger",bodyColor:0xD4AC0D,skinColor:0xE8D5B7,hairColor:0x784212,female:false,leader:false},
+  {id:"bubble",name:"Bubble",bodyColor:0x5DADE2,skinColor:0xAED6F1,hairColor:0x2E86C1,female:false,leader:false},
+  {id:"npc_guard",name:"Guard",bodyColor:0x555566,skinColor:0xE8D5B7,hairColor:0x111111,female:false,leader:false},
+  {id:"npc_vendor",name:"Vendor",bodyColor:0x33aa33,skinColor:0xFDBCB4,hairColor:0x5C3317,female:false,leader:false},
+  {id:"npc_clown",name:"Clown",bodyColor:0xff4400,skinColor:0xffffff,hairColor:0xff0000,female:false,leader:false}
+];
+
+var npcs=npcDefs.map(function(nd,i){
+  var g2=buildChar(nd,false);
+  var row=Math.floor(i/4),col=i%4;
+  g2.position.set(-9+col*6,0.15,-6+row*6);
+  g2.userData.x=-9+col*6;g2.userData.z=-6+row*6;
+  g2.userData.speed=0.02+Math.random()*0.01;
+  g2.userData.dir=Math.random()*Math.PI*2;
+  g2.userData.dirTimer=2+Math.random()*3;
+  scene.add(g2);return g2;
+});
+
+var opDefs=[
+  {id:"pomni",name:"CoolPlayer99",bodyColor:0x1a3aff,skinColor:0xFDBCB4,hairColor:0x4169E1,female:true,leader:false},
+  {id:"jax",name:"PS5_User",bodyColor:0x6C3483,skinColor:0xE8D5B7,hairColor:0x2C3E50,female:false,leader:false},
+  {id:"ragatha",name:"VoidWalker",bodyColor:0xFF69B4,skinColor:0xFFB6C1,hairColor:0xFF1493,female:true,leader:false}
+];
+var otherPlayers=opDefs.map(function(pd,i){
+  var g3=buildChar(pd,false);
+  g3.position.set(6+i*3,0.15,3+i*2);
+  g3.userData.x=6+i*3;g3.userData.z=3+i*2;
+  g3.userData.speed=0.015+Math.random()*0.01;
+  g3.userData.dir=Math.random()*Math.PI*2;
+  g3.userData.dirTimer=2+Math.random()*3;
+  scene.add(g3);return g3;
+});
+
+var GRAVITY=-18,JUMP_VEL=7,MOVE_SPEED=6,FLY_SPEED=10;
+
+canvas3d.addEventListener("click",function(){
+  if(gameStarted&&!chatOpen&&!dialogOpen&&!actionOpen&&!roomMenuOpen) canvas3d.requestPointerLock();
+});
+document.addEventListener("pointerlockchange",function(){
+  var locked=document.pointerLockElement===canvas3d;
+  document.getElementById("crosshair").style.display=locked?"block":"none";
+});
+document.addEventListener("mousemove",function(e){
+  if(document.pointerLockElement===canvas3d){
+    cam.yaw-=e.movementX*0.002;
+    cam.pitch-=e.movementY*0.002;
+    cam.pitch=Math.max(-Math.PI/2.5,Math.min(Math.PI/2.5,cam.pitch));
+  }
+});
+document.addEventListener("keydown",function(e){
+  if(chatOpen)return;
+  keys[e.code]=true;
+  if(e.code==="Space"&&onGround&&!flying){playerVelY=JUMP_VEL;onGround=false;}
+  if(e.code==="KeyE")tryInteract();
+  if(e.code==="KeyH")toggleActionMenu();
+  if(e.code==="KeyM")toggleRoomMenu();
+  if(e.code==="KeyF"&&player.isLeader)toggleFly();
+  if(e.code==="KeyT"&&player.isLeader)doTP();
+  if(e.code==="KeyP"&&player.isLeader)togglePhase();
+  if(e.code==="KeyR"&&player.isLeader)doReality();
+  if(e.code==="KeyQ")changeFloor(1);
+  if(e.code==="KeyZ")changeFloor(-1);
+  if(e.code==="Tab"){e.preventDefault();toggleChat();}
+  if(e.code==="Escape"){
+    closeDialog();
+    document.getElementById("actionMenu").style.display="none";
+    document.getElementById("roomMenu").style.display="none";
+    actionOpen=false;roomMenuOpen=false;
+    document.exitPointerLock();
+  }
+});
+document.addEventListener("keyup",function(e){keys[e.code]=false;});
+
+function getFloorBase(){return FLOOR_OFFSETS[currentFloorIdx];}
+
+function changeFloor(dir){
+  currentFloorIdx=Math.max(0,Math.min(3,currentFloorIdx+dir));
+  var f=getFloorBase();
+  player.x=f.x;player.y=f.y+2;player.z=f.z;
+  playerVelY=0;
+  document.getElementById("hudFloor").textContent="Floor "+(currentFloorIdx+1);
+  document.getElementById("mmLabel").textContent=f.name;
+  document.getElementById("zoneLabel").textContent=f.name.toUpperCase();
+  var fi=document.getElementById("floorIndicator");
+  fi.textContent=f.name;fi.style.display="block";
+  setTimeout(function(){fi.style.display="none";},1600);
+  addChat("System","Moved to: "+f.name,"#ffd400");
+}
+
+function updatePlayer(dt){
+  if(!gameStarted)return{mx:0,mz:0};
+  var f=getFloorBase();
+  var groundY=f.y+1.0;
+  var fwdX=-Math.sin(cam.yaw),fwdZ=-Math.cos(cam.yaw);
+  var rtX=Math.cos(cam.yaw),rtZ=-Math.sin(cam.yaw);
+  var mx=0,mz=0;
+  if(keys["KeyW"]||keys["ArrowUp"]){mx+=fwdX;mz+=fwdZ;}
+  if(keys["KeyS"]||keys["ArrowDown"]){mx-=fwdX;mz-=fwdZ;}
+  if(keys["KeyA"]||keys["ArrowLeft"]){mx-=rtX;mz-=rtZ;}
+  if(keys["KeyD"]||keys["ArrowRight"]){mx+=rtX;mz+=rtZ;}
+  var spd=flying?FLY_SPEED:MOVE_SPEED;
+  var len=Math.sqrt(mx*mx+mz*mz);
+  if(len>0){mx/=len;mz/=len;}
+  player.x+=mx*spd*dt;
+  player.z+=mz*spd*dt;
+  if(flying){
+    if(keys["Space"])player.y+=FLY_SPEED*dt;
+    if(keys["ShiftLeft"])player.y-=FLY_SPEED*dt;
+  } else {
+    playerVelY+=GRAVITY*dt;
+    player.y+=playerVelY*dt;
+  }
+  if(!flying&&player.y<groundY){player.y=groundY;playerVelY=0;onGround=true;}
+  else if(player.y>groundY+0.1)onGround=false;
+  if(!phasing){
+    var minX=f.x-13,maxX=f.x+13,minZ=f.z-13,maxZ=f.z+13;
+    player.x=Math.max(minX,Math.min(maxX,player.x));
+    player.z=Math.max(minZ,Math.min(maxZ,player.z));
+  }
+  camera.position.set(player.x,player.y+1.4,player.z);
+  camera.rotation.order="YXZ";
+  camera.rotation.y=cam.yaw;
+  camera.rotation.x=cam.pitch;
+  if(playerMesh){
+    playerMesh.position.set(player.x,player.y-0.85,player.z);
+    playerMesh.rotation.y=cam.yaw+Math.PI;
+    updateCharPhysics(playerMesh,dt,mx,mz);
+  }
+  document.getElementById("hudName").textContent=player.name;
+  document.getElementById("hudZone").textContent=getFloorBase().name;
+  nearNPC=null;
+  var all=npcs.concat(otherPlayers);
+  for(var ci=0;ci<all.length;ci++){
+    var c=all[ci];
+    var dx=c.userData.x-player.x,dz=c.userData.z-player.z;
+    if(Math.sqrt(dx*dx+dz*dz)<2.5){nearNPC=c;break;}
+  }
+  document.getElementById("interactHint").style.display=nearNPC?"block":"none";
+  return{mx:mx,mz:mz};
+}
+
+function updateCharPhysics(g,dt,mx,mz){
+  var ud=g.userData;
+  if(ud.breastL&&ud.breastR){
+    var acY=(mz-(ud.prevMZ||0))*8,acX=(mx-(ud.prevMX||0))*5;
+    ud.breastVelY=(ud.breastVelY||0)+acY;ud.breastVelX=(ud.breastVelX||0)+acX;
+    ud.breastVelY*=0.82;ud.breastVelX*=0.82;
+    var bnc=Math.sin(Date.now()*0.006)*0.012;
+    var bY=(ud.breastVelY||0)*0.03+bnc,bX=(ud.breastVelX||0)*0.02;
+    ud.breastL.position.y=1.08+bY;ud.breastR.position.y=1.08+bY;
+    ud.breastL.position.x=-0.17-bX;ud.breastR.position.x=0.17+bX;
+    ud.prevMX=mx;ud.prevMZ=mz;
+  }
+  if(ud.floating){
+    ud.floatAngle=(ud.floatAngle||0)+dt*1.2;
+    g.position.y=(ud.y||0)+Math.sin(ud.floatAngle)*0.3+0.5;
+  }
+  if(ud.auraRing){ud.auraAngle=(ud.auraAngle||0)+dt*1.5;ud.auraRing.rotation.z=ud.auraAngle;}
+  if(ud.label)ud.label.quaternion.copy(camera.quaternion);
+}
+
+function updateNPC(g,dt){
+  var ud=g.userData;
+  ud.dirTimer-=dt;
+  if(ud.dirTimer<=0){ud.dir=Math.random()*Math.PI*2;ud.dirTimer=2+Math.random()*3;}
+  var nx=(ud.x||0)+Math.cos(ud.dir)*(ud.speed||0.02);
+  var nz=(ud.z||0)+Math.sin(ud.dir)*(ud.speed||0.02);
+  var f=getFloorBase();
+  if(Math.abs(nx-f.x)<12&&Math.abs(nz-f.z)<12){
+    ud.x=nx;ud.z=nz;
+    g.position.x=nx;g.position.z=nz;
+    g.rotation.y=ud.dir+Math.PI;
+  } else {ud.dir+=Math.PI;}
+  updateCharPhysics(g,dt,0,0);
+}
+
+function drawMinimap(){
+  var mc=document.getElementById("minimapCanvas");
+  var ctx=mc.getContext("2d");
+  var W=130,H=90;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle="rgba(0,0,0,0.85)";ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="#A1C9F4";ctx.lineWidth=1;ctx.strokeRect(5,5,W-10,H-10);
+  var f=getFloorBase(),scale=(W-10)/28,cx=W/2,cy=H/2;
+  for(var ni=0;ni<npcs.length;ni++){
+    var n=npcs[ni];
+    ctx.fillStyle="#ff9900";ctx.beginPath();
+    ctx.arc(cx+(n.userData.x-f.x)*scale,cy+(n.userData.z-f.z)*scale,3,0,Math.PI*2);ctx.fill();
+  }
+  for(var oi=0;oi<otherPlayers.length;oi++){
+    var op=otherPlayers[oi];
+    ctx.fillStyle="#00ff88";ctx.beginPath();
+    ctx.arc(cx+(op.userData.x-f.x)*scale,cy+(op.userData.z-f.z)*scale,3,0,Math.PI*2);ctx.fill();
+  }
+  ctx.fillStyle="#ffd400";ctx.beginPath();
+  ctx.arc(cx+(player.x-f.x)*scale,cy+(player.z-f.z)*scale,4,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle="#ffd400";ctx.lineWidth=2;ctx.beginPath();
+  ctx.moveTo(cx+(player.x-f.x)*scale,cy+(player.z-f.z)*scale);
+  ctx.lineTo(cx+(player.x-f.x)*scale-Math.sin(cam.yaw)*8,cy+(player.z-f.z)*scale-Math.cos(cam.yaw)*8);
+  ctx.stroke();
+}
+
+function tryInteract(){
+  if(!nearNPC)return;
+  var id=nearNPC.userData.data.id;
+  var lines=DIALOGS[id]||["...","Hello!","See you around."];
+  var line=lines[Math.floor(Math.random()*lines.length)];
+  document.getElementById("dialogSpeaker").textContent=nearNPC.userData.data.name+" says:";
+  document.getElementById("dialogText").textContent=line;
+  document.getElementById("dialogBox").style.display="block";
+  dialogOpen=true;document.exitPointerLock();
+  addChat(nearNPC.userData.data.name,line,"#A1C9F4");
+}
+function closeDialog(){document.getElementById("dialogBox").style.display="none";dialogOpen=false;}
+
+function toggleChat(){chatOpen=!chatOpen;if(chatOpen){document.getElementById("chatMsg").focus();document.exitPointerLock();}}
+function addChat(name,msg,color){
+  var FILTER=["fuck","shit","bitch","cunt","bastard","middelvinger"];
+  var clean=msg;
+  for(var fi=0;fi<FILTER.length;fi++) clean=clean.replace(new RegExp(FILTER[fi],"gi"),"***");
+  var log=document.getElementById("chatLog");
+  var div=document.createElement("div");
+  div.style.cssText="margin-bottom:3px;font-size:11px;";
+  var isLdr=name===player.name&&player.isLeader;
+  div.innerHTML='<span style="color:'+(color||"#A1C9F4")+';font-weight:bold;">'+name+(isLdr?" :crown:":"")+':</span> <span style="color:#fbfbff;">'+clean+'</span>';
+  log.appendChild(div);log.scrollTop=log.scrollHeight;
+}
+function sendChat(){
+  var inp=document.getElementById("chatMsg");
+  var msg=inp.value.trim();if(!msg)return;
+  addChat(player.name,msg,player.isLeader?"#ffd400":"#fbfbff");
+  inp.value="";chatOpen=false;
+}
+function startBotChat(){
+  var msgs=[
+    {n:"CoolPlayer99",m:"Hey everyone! Ready to explore?"},
+    {n:"PS5_User",m:"Playing from my PS5! This is sick!"},
+    {n:"VoidWalker",m:"I found the void portal in the basement..."},
+    {n:"Ragatha",m:"Welcome to the circus!"},
+    {n:"Jax",m:"Whatever."},
+    {n:"System",m:"Private rooms available! Press M to create one."}
+  ];
+  var i=0;
+  var t=setInterval(function(){
+    if(i>=msgs.length){clearInterval(t);return;}
+    addChat(msgs[i].n,msgs[i].m,i===5?"#ffd400":"#A1C9F4");i++;
+  },1200);
+}
+
+function toggleActionMenu(){actionOpen=!actionOpen;document.getElementById("actionMenu").style.display=actionOpen?"block":"none";if(actionOpen)document.exitPointerLock();}
+function closeActionMenu(){actionOpen=false;document.getElementById("actionMenu").style.display="none";}
+function doAction(act){
+  var msgs={sleep:"You rest... Zzzz...",eat:"You eat a burger!",drink:"You drink water.",alcohol:"You drink alcohol... wobbly...",smoke:"You light a cigarette.",vape:"You blow a vape cloud.",pc:"You boot the gaming PC!",ps5:"You turn on the PS5!",laptop:"You open the laptop.",phone:"You pick up your phone.",shower:"Refreshing shower!",gun:"You hold your gun. Stay safe.",lock:"Room locked!"};
+  addChat("System",msgs[act]||"Done!","#8DE5A1");closeActionMenu();
+}
+
+var rooms=[
+  {id:"1",name:"Throne Room HQ",zone:"throne",priv:false,players:3,max:16,code:null},
+  {id:"2",name:"Beach Party",zone:"beach",priv:false,players:7,max:16,code:null},
+  {id:"3",name:"Void Club",zone:"void",priv:true,players:2,max:16,code:"I1XTKU"},
+  {id:"4",name:"Kermis Madness",zone:"fair",priv:false,players:12,max:16,code:null}
+];
+function toggleRoomMenu(){
+  roomMenuOpen=!roomMenuOpen;
+  if(roomMenuOpen){renderRoomList();document.getElementById("roomMenu").style.display="block";document.exitPointerLock();}
+  else document.getElementById("roomMenu").style.display="none";
+}
+function renderRoomList(){
+  var div=document.getElementById("roomList");
+  var html="";
+  for(var ri=0;ri<rooms.length;ri++){
+    var r=rooms[ri];
+    var lb=r.priv?"<span style='color:#f04438;'>PRIV</span>":"<span style='color:#8DE5A1;'>PUB</span>";
+    html+='<div style="background:#1a1a2e;border:1px solid #333;border-radius:6px;padding:6px 8px;margin-bottom:5px;font-size:12px;display:flex;justify-content:space-between;align-items:center;">';
+    html+='<span>'+r.name+' '+lb+'</span>';
+    html+='<span style="color:#909094;">'+r.players+'/'+r.max+'</span>';
+    html+='<button onclick="joinRoom(\''+r.id+'\')" style="background:#ffd400;color:#05000f;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:10px;">Join</button></div>';
+  }
+  div.innerHTML=html;
+}
+function joinRoom(id){
+  var r=null;for(var ri=0;ri<rooms.length;ri++)if(rooms[ri].id===id)r=rooms[ri];
+  if(!r)return;
+  if(r.priv){var code=prompt("Enter room code:");if(!code||code.toUpperCase()!==r.code){alert("Wrong code!");return;}}
+  addChat("System","Joined room: "+r.name,"#ffd400");
+  document.getElementById("roomMenu").style.display="none";roomMenuOpen=false;
+}
+function createRoom(){
+  var name=document.getElementById("newRoomName").value.trim()||"My Room";
+  var priv=document.getElementById("privateRoom").checked;
+  var code=null;
+  if(priv){var chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";code="";for(var i=0;i<6;i++)code+=chars[Math.floor(Math.random()*36)];}
+  rooms.push({id:String(rooms.length+1),name:name,zone:"throne",priv:priv,players:1,max:16,code:code});
+  if(priv){document.getElementById("generatedCode").textContent=code;document.getElementById("codePopup").style.display="block";}
+  addChat("System","Room created: "+name+(priv?" (private)":""),"#8DE5A1");renderRoomList();
+}
+function joinWithCode(){
+  var code=document.getElementById("joinCode").value.trim().toUpperCase();
+  var r=null;for(var ri=0;ri<rooms.length;ri++)if(rooms[ri].code===code)r=rooms[ri];
+  if(r){addChat("System","Joined: "+r.name,"#ffd400");document.getElementById("roomMenu").style.display="none";roomMenuOpen=false;}
+  else alert("Room not found!");
+}
+
+function toggleFly(){flying=!flying;playerVelY=0;addChat("System",flying?"FLY MODE ON!":"Landing...","#ffd400");}
+function doTP(){var f=getFloorBase();player.x=f.x+(Math.random()-0.5)*20;player.z=f.z+(Math.random()-0.5)*20;addChat("System","TELEPORTED!","#ffd400");}
+function togglePhase(){phasing=!phasing;addChat("System",phasing?"PHASE: walk through walls!":"Phase off.","#ffd400");}
+function doReality(){changeFloor(Math.floor(Math.random()*4)-currentFloorIdx);addChat("System","REALITY SHIFT!","#ffd400");}
+
+function buildCharGrid(){
+  var g=document.getElementById("charGrid");
+  for(var i=0;i<CHARS.length;i++){
+    var c=CHARS[i];
+    var div=document.createElement("div");
+    div.className="char-card";
+    div.innerHTML='<div class="char-emoji">'+c.emoji+'</div><div class="char-name">'+c.name+'</div>';
+    (function(cc,dd){
+      dd.onclick=function(){
+        var cards=document.querySelectorAll(".char-card");
+        for(var k=0;k<cards.length;k++)cards[k].classList.remove("selected");
+        dd.classList.add("selected");selectedChar=cc;
+        document.getElementById("customName").value=cc.name;
+        document.getElementById("customGender").value=cc.female?"female":"male";
+      };
+    })(c,div);
+    g.appendChild(div);
+  }
+}
+
+function checkAge(){
+  var age=parseInt(document.getElementById("ageInput").value);
+  if(isNaN(age)||age<13){document.getElementById("ageError").style.display="block";return;}
+  document.getElementById("ageScreen").style.display="none";
+  document.getElementById("charScreen").style.display="flex";
+  buildCharGrid();
+  selectedChar=CHARS[0];
+  document.querySelectorAll(".char-card")[0].classList.add("selected");
+  document.getElementById("customName").value=CHARS[0].name;
+}
+
+function startGame(){
+  var name=document.getElementById("customName").value.trim()||(selectedChar?selectedChar.name:"Player");
+  var gender=document.getElementById("customGender").value;
+  var skin=parseInt(document.getElementById("customSkin").value,16);
+  var hair=parseInt(document.getElementById("customHair").value,16);
+  var charData=selectedChar?JSON.parse(JSON.stringify(selectedChar)):JSON.parse(JSON.stringify(CHARS[0]));
+  charData.name=name;charData.gender=gender;charData.female=gender==="female";
+  charData.skinColor=skin;charData.hairColor=hair;
+  var isLeader=name.toLowerCase().replace(/[\s\-_]/g,"").indexOf("dinoraptor")>=0;
+  charData.leader=isLeader;
+  if(isLeader){charData.id="dino_raptor";charData.bodyColor=0xFFD700;charData.hairColor=0x4B0082;charData.skinColor=0xFFD700;charData.female=false;}
+  player.name=name;player.charId=charData.id;player.isLeader=isLeader;player.gender=gender;
+  playerMesh=buildChar(charData,true);
+  player.x=0;player.y=2;player.z=0;
+  camera.position.set(0,3.4,0);
+  scene.add(playerMesh);
+  document.getElementById("overlay").style.display="none";
+  document.getElementById("hudName").textContent=name;
+  if(isLeader){
+    document.getElementById("powerBar").style.display="block";
+    addChat("System","Welcome back, Supreme Leader Dino Raptor! ALL POWERS ACTIVE.","#ffd400");
+  } else {
+    addChat("System","Welcome, "+name+"! You joined the Amazing Digital Circus!","#8DE5A1");
+  }
+  document.getElementById("hudPlayers").textContent=(4+Math.floor(Math.random()*8))+" online";
+  gameStarted=true;
+  startBotChat();
+  canvas3d.requestPointerLock();
+}
+
+function animate(time){
+  requestAnimationFrame(animate);
+  var dt=Math.min((time-lastTime)/1000,0.05);lastTime=time;
+  fpsCount++;fpsTime+=dt;
+  if(fpsTime>1){fps=Math.round(fpsCount/fpsTime);fpsCount=0;fpsTime=0;}
+  document.getElementById("fps").textContent=fps+" fps";
+  if(gameStarted){
+    updatePlayer(dt);
+    for(var ni=0;ni<npcs.length;ni++)updateNPC(npcs[ni],dt);
+    for(var oi=0;oi<otherPlayers.length;oi++)updateNPC(otherPlayers[oi],dt);
+    drawMinimap();
+    ptL1.position.x=Math.sin(time*0.001)*5;
+    ptL1.position.z=Math.cos(time*0.001)*5;
+  }
+  renderer.render(scene,camera);
+}
+animate(0);
+</script>
+</body>
+</html>
