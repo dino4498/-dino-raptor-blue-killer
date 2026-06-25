@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>Dino-Raptor-Blue-Killer</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#05000f;font-family:'Segoe UI',sans-serif;color:#fbfbff}
+#c{display:block;width:100vw;height:100vh}
+#overlay{position:fixed;inset:0;background:linear-gradient(135deg,#05000f,#0d0020,#050010);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;overflow-y:auto;padding:20px}
+#overlay h1{font-size:2.6em;color:#ffd400;text-shadow:0 0 40px #ffd40099;margin-bottom:6px;text-align:center;letter-spacing:3px}
+.sub{color:#A1C9F4;font-size:1em;margin-bottom:18px;text-align:center}
+.fg{margin-bottom:10px;width:340px}
+.fg label{display:block;margin-bottom:4px;color:#A1C9F4;font-size:11px;text-transform:uppercase;letter-spacing:1px}
+.fg input,.fg select{width:100%;background:#1a1a2e;border:1px solid #555;color:#fbfbff;padding:9px;border-radius:8px;font-size:14px}
+.cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:480px;margin-bottom:14px}
+.cc{background:#1a1a2e;border:2px solid #333;border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.cc:hover,.cc.sel{border-color:#ffd400;background:#2a2a3e;transform:scale(1.05)}
+.ce{font-size:1.9em}
+.cn{font-size:9px;margin-top:3px;color:#A1C9F4}
+.bigbtn{background:linear-gradient(135deg,#ffd400,#ff8c00);color:#05000f;border:none;padding:14px 44px;border-radius:12px;font-size:1.1em;font-weight:bold;cursor:pointer;margin-top:8px}
+.bigbtn:hover{transform:scale(1.04)}
+.cgrid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:480px;background:#1a1a2e;border:1px solid #444;border-radius:10px;padding:14px;margin-bottom:12px}
+#hud{position:fixed;top:8px;left:8px;background:rgba(0,0,0,.78);border:1px solid #ffd400;border-radius:8px;padding:5px 14px;font-size:12px;pointer-events:none;z-index:10}
+#zlbl{position:fixed;top:8px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.82);border:1px solid #A1C9F4;border-radius:20px;padding:3px 18px;font-size:13px;font-weight:bold;pointer-events:none;z-index:10}
+#mm{position:fixed;top:8px;right:8px;z-index:10;pointer-events:none}
+#mmc{background:rgba(0,0,0,.85);border:1px solid #A1C9F4;border-radius:8px}
+#ctrl{position:fixed;bottom:8px;right:8px;background:rgba(0,0,0,.7);border:1px solid #444;border-radius:8px;padding:7px 10px;font-size:10px;color:#909094;pointer-events:none;z-index:10;line-height:1.9}
+#chat{position:fixed;bottom:8px;left:8px;width:280px;background:rgba(0,0,0,.88);border:1px solid #A1C9F4;border-radius:8px;z-index:10}
+#clog{height:100px;overflow-y:auto;padding:5px 8px;font-size:11px}
+#crow{display:flex;border-top:1px solid #333}
+#crow input{flex:1;background:transparent;border:none;color:#fbfbff;padding:5px 8px;font-size:11px;outline:none}
+#crow button{background:#ffd400;color:#05000f;border:none;padding:5px 10px;cursor:pointer;font-weight:bold;border-radius:0 0 8px 0;font-size:11px}
+#pbar{position:fixed;top:48px;left:8px;display:none;z-index:10;flex-direction:column;gap:4px}
+.pbtn{background:rgba(255,212,0,.18);border:1px solid #ffd400;color:#ffd400;padding:5px 14px;border-radius:6px;cursor:pointer;font-size:11px}
+.pbtn:hover{background:#ffd400;color:#05000f}
+#hint{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.88);border:1px solid #8DE5A1;border-radius:20px;padding:5px 20px;font-size:12px;display:none;z-index:10;pointer-events:none;color:#8DE5A1}
+#dlg{position:fixed;bottom:150px;left:50%;transform:translateX(-50%);background:#0d0d1a;border:2px solid #ffd400;border-radius:12px;padding:14px 20px;max-width:400px;width:90%;display:none;z-index:50}
+#dlg .spk{color:#ffd400;font-weight:bold;margin-bottom:5px;font-size:13px}
+#dlg .txt{color:#fbfbff;font-size:12px;line-height:1.6}
+#dlg button{margin-top:8px;background:#ffd400;color:#05000f;border:none;padding:5px 16px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px}
+#amenu{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0d0d1a;border:2px solid #A1C9F4;border-radius:12px;padding:16px;width:300px;display:none;z-index:100}
+#amenu h3{color:#A1C9F4;margin-bottom:10px;text-align:center;font-size:14px}
+.abtn{display:block;width:100%;padding:7px;border:none;border-radius:7px;cursor:pointer;font-size:12px;font-weight:bold;margin-bottom:5px;background:#1a1a2e;color:#fbfbff;border:1px solid #333;text-align:left}
+.abtn:hover{background:#2a2a4e;border-color:#A1C9F4}
+#rmenu{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0d0d1a;border:2px solid #ffd400;border-radius:12px;padding:16px;width:360px;display:none;z-index:100}
+#rmenu h3{color:#ffd400;margin-bottom:8px;text-align:center;font-size:14px}
+#rmenu input,#rmenu select{width:100%;background:#1a1a2e;border:1px solid #555;color:#fbfbff;padding:7px;border-radius:6px;margin-bottom:6px;font-size:12px}
+#rmenu button{width:100%;padding:7px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:bold;margin-bottom:5px}
+.bg{background:#ffd400;color:#05000f}
+.br{background:#f04438;color:#fff}
+.bb{background:#1F77B4;color:#fff}
+#cpop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0d0d1a;border:2px solid #8DE5A1;border-radius:12px;padding:22px;text-align:center;display:none;z-index:150}
+#cpop .code{font-size:2.4em;color:#ffd400;font-weight:bold;letter-spacing:8px;margin:12px 0}
+#cpop button{background:#8DE5A1;color:#05000f;border:none;padding:7px 20px;border-radius:8px;cursor:pointer;font-weight:bold}
+#flind{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.92);border:2px solid #A1C9F4;border-radius:10px;padding:10px 22px;font-size:1.1em;color:#A1C9F4;display:none;z-index:20;pointer-events:none}
+#cross{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:5;display:none}
+#cross::before{content:"";position:absolute;width:18px;height:2px;background:#fff;opacity:.7;top:8px;left:0}
+#cross::after{content:"";position:absolute;width:2px;height:18px;background:#fff;opacity:.7;top:0;left:8px}
+#lockscreen{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:15;flex-direction:column;gap:12px;font-size:1.3em;color:#A1C9F4;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- OVERLAY: Age + Character select -->
+<div id="overlay">
+  <div id="scr_age" style="display:flex;flex-direction:column;align-items:center">
+    <h1>DINO-RAPTOR-BLUE-KILLER</h1>
+    <p class="sub">The Amazing Digital Circus — 3D Online World</p>
+    <div class="fg"><label>Your Age</label><input type="number" id="ageInp" placeholder="Enter your age" min="1" max="120"></div>
+    <div id="ageErr" style="color:#f04438;font-size:12px;margin-bottom:6px;display:none">You must be 13 or older to play!</div>
+    <button class="bigbtn" onclick="checkAge()">ENTER THE CIRCUS</button>
+  </div>
+  <div id="scr_char" style="display:none;flex-direction:column;align-items:center">
+    <h1 style="font-size:2em;margin-bottom:5px">Choose Your Character</h1>
+    <p class="sub">Pick one or customise below!</p>
+    <div class="cgrid" id="cGrid"></div>
+    <div class="cgrid2">
+      <div class="fg" style="margin:0"><label>Your Name</label><input type="text" id="pName" placeholder="Enter name..."></div>
+      <div class="fg" style="margin:0"><label>Gender</label><select id="pGender"><option value="male">Boy</option><option value="female">Girl</option><option value="nonbinary">Non-binary</option></select></div>
+      <div class="fg" style="margin:0"><label>Skin colour</label><select id="pSkin"><option value="FDBCB4">Light</option><option value="E8956D">Medium</option><option value="C68642">Tan</option><option value="8D5524">Dark</option><option value="7EC8E3">Blue</option><option value="FFD700">Gold</option></select></div>
+      <div class="fg" style="margin:0"><label>Hair colour</label><select id="pHair"><option value="111111">Black</option><option value="FFD700">Gold</option><option value="8B0000">Red</option><option value="4169E1">Blue</option><option value="9400D3">Purple</option><option value="FF69B4">Pink</option><option value="ffffff">White</option></select></div>
+    </div>
+    <button class="bigbtn" onclick="startGame()">PLAY NOW!</button>
+  </div>
+</div>
+
+<!-- GAME CANVAS -->
+<canvas id="c"></canvas>
+<div id="cross"></div>
+
+<!-- Click-to-lock screen -->
+<div id="lockscreen" onclick="requestLock()">
+  <div>🎮 Click here to play</div>
+  <div style="font-size:.7em;color:#909094">Mouse to look around · WASD to move · SPACE to jump</div>
+</div>
+
+<!-- HUD -->
+<div id="hud"><span id="hName">Player</span> | <span id="hZone">Main Hall</span> | Floor <span id="hFloor">1</span> | <span id="hPlrs">4 online</span></div>
+<div id="zlbl">MAIN HALL</div>
+<div id="flind"></div>
+<div id="mm"><canvas id="mmc" width="130" height="90"></canvas><div style="font-size:9px;color:#909094;text-align:center;margin-top:2px" id="mmLbl">Floor 1</div></div>
+
+<!-- Dino Raptor powers -->
+<div id="pbar" style="display:none">
+  <button class="pbtn" onclick="toggleFly()">✈ FLY [F]</button>
+  <button class="pbtn" onclick="doTP()">⚡ TP [T]</button>
+  <button class="pbtn" onclick="togglePhase()">👻 PHASE [P]</button>
+  <button class="pbtn" onclick="doReality()">🌍 SHIFT [R]</button>
+</div>
+
+<!-- Controls hint -->
+<div id="ctrl">WASD — move<br>MOUSE — look<br>SPACE — jump<br>E — talk to NPC<br>H — room menu<br>M — multiplayer<br>C — clothes toggle<br>Q/Z — floor up/down<br>ESC — unlock mouse</div>
+
+<!-- Interact hint -->
+<div id="hint">Press E to talk</div>
+
+<!-- Dialog box -->
+<div id="dlg">
+  <div class="spk" id="dlgSpk"></div>
+  <div class="txt" id="dlgTxt"></div>
+  <button onclick="closeDlg()">Continue</button>
+</div>
+
+<!-- Action menu -->
+<div id="amenu">
+  <h3>Room Actions</h3>
+  <button class="abtn" onclick="doAct('sleep')">😴 Sleep</button>
+  <button class="abtn" onclick="doAct('eat')">🍔 Eat</button>
+  <button class="abtn" onclick="doAct('drink')">💧 Drink water</button>
+  <button class="abtn" onclick="doAct('alcohol')">🍺 Drink alcohol</button>
+  <button class="abtn" onclick="doAct('smoke')">🚬 Smoke</button>
+  <button class="abtn" onclick="doAct('vape')">💨 Vape</button>
+  <button class="abtn" onclick="doAct('pc')">🖥 Play on PC</button>
+  <button class="abtn" onclick="doAct('ps5')">🎮 Play on PS5</button>
+  <button class="abtn" onclick="doAct('laptop')">💻 Chat on Laptop</button>
+  <button class="abtn" onclick="doAct('phone')">📱 Use Phone</button>
+  <button class="abtn" onclick="doAct('shower')">🚿 Take a shower</button>
+  <button class="abtn" onclick="doAct('gun')">🔫 Hold gun</button>
+  <button class="abtn" onclick="toggleClothes()">👗 Toggle clothes</button>
+  <button class="abtn" onclick="closeMenu('amenu')">✖ Close</button>
+</div>
+
+<!-- Room / multiplayer menu -->
+<div id="rmenu">
+  <h3>Multiplayer Rooms</h3>
+  <div id="rList" style="max-height:160px;overflow-y:auto;margin-bottom:8px"></div>
+  <input type="text" id="rNameInp" placeholder="Room name...">
+  <select id="rZoneInp">
+    <option>Main Hall</option><option>Throne Room</option><option>Beach</option>
+    <option>Void</option><option>Fairground</option><option>Moon</option>
+  </select>
+  <label style="font-size:11px;color:#A1C9F4;display:flex;align-items:center;gap:6px;margin-bottom:6px">
+    <input type="checkbox" id="rPriv"> Private room (code protected)
+  </label>
+  <button class="bg" onclick="createRoom()">Create Room</button>
+  <input type="text" id="rCodeInp" placeholder="Enter 6-letter code to join...">
+  <button class="bb" onclick="joinWithCode()">Join with code</button>
+  <button class="br" onclick="closeMenu('rmenu')">Close</button>
+</div>
+
+<!-- Code popup -->
+<div id="cpop">
+  <div style="color:#A1C9F4;font-size:14px">Your private room code:</div>
+  <div class="code" id="cpopCode">XXXXXX</div>
+  <div style="font-size:11px;color:#909094;margin-bottom:10px">Share this with friends only!</div>
+  <button onclick="closeMenu('cpop')">Got it!</button>
+</div>
+
+<!-- Chat -->
+<div id="chat">
+  <div id="clog"></div>
+  <div id="crow">
+    <input type="text" id="cInp" placeholder="Chat..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════
+//  CONSTANTS & CONFIG
+// ═══════════════════════════════════════════════════════
+const FLOOR_HEIGHT = 8;
+const GRAVITY = -25;
+const JUMP_SPEED = 12;
+const MOVE_SPEED = 8;
+const PLAYER_HEIGHT = 1.8;
+
+const CHARACTERS = [
+  {id:'dino',   name:'Dino Raptor', emoji:'🐉', role:'Supreme Leader', gender:'male',   skinCol:0xFFD700, hairCol:0x9400D3, clothCol:0x4B0082, isLeader:true,  outfitTop:0xffd400, outfitBot:0x4B0082},
+  {id:'pomni',  name:'Pomni',       emoji:'🃏', role:'Jester',         gender:'female', skinCol:0x7EC8E3, hairCol:0xffffff, clothCol:0x4169E1, isLeader:false, outfitTop:0x4169E1, outfitBot:0x8B0000},
+  {id:'ragatha',name:'Ragatha',     emoji:'🧸', role:'Rag Doll',       gender:'female', skinCol:0xFFB6C1, hairCol:0xFF69B4, clothCol:0xFF6B9D, isLeader:false, outfitTop:0xFF6B9D, outfitBot:0xff9999},
+  {id:'jax',    name:'Jax',         emoji:'🐇', role:'Trickster',      gender:'male',   skinCol:0x9B59B6, hairCol:0x9B59B6, clothCol:0x2C3E50, isLeader:false, outfitTop:0x2C3E50, outfitBot:0x1a252f},
+  {id:'gangle', name:'Gangle',      emoji:'🎭', role:'Marionette',     gender:'female', skinCol:0xF9E4B7, hairCol:0x8B4513, clothCol:0x8B0000, isLeader:false, outfitTop:0x8B0000, outfitBot:0x5c0000},
+  {id:'zooble', name:'Zooble',      emoji:'🧩', role:'Shapeshifter',   gender:'female', skinCol:0x27AE60, hairCol:0xE74C3C, clothCol:0x1ABC9C, isLeader:false, outfitTop:0x1ABC9C, outfitBot:0x27AE60},
+  {id:'kinger', name:'Kinger',      emoji:'♔',  role:'Chess King',     gender:'male',   skinCol:0xF5CBA7, hairCol:0xFFD700, clothCol:0xFFD700, isLeader:false, outfitTop:0xFFD700, outfitBot:0xFFD700},
+  {id:'bubble', name:'Bubble',      emoji:'🫧', role:'Sphere',         gender:'nonbinary',skinCol:0xA1C9F4,hairCol:0xA1C9F4,clothCol:0xA1C9F4,isLeader:false, outfitTop:0xA1C9F4, outfitBot:0xA1C9F4}
+];
+
+const NPC_DIALOGUES = {
+  pomni:  ["Help me get out of here!!","I don't want to be a jester...","Is there an exit somewhere?","I miss the real world..."],
+  ragatha:["Hi there! Stay positive!","Everything will be okay!","Want to join me at the fairground?","Keep smiling, friend!"],
+  jax:    ["Oh look, another NPC talking...","I'm bored. Entertain me.","You think you're special? Cool.","Whatever."],
+  gangle: ["*sniffles* ...hello.","I just want to dance again...","My strings hurt today...","*comedy mask* Ha ha! *tragedy mask* ..."],
+  zooble: ["Don't touch my stuff.","I'm fine. Leave me alone.","...okay fine hi.","My arm is a wheel. Don't ask."],
+  kinger: ["THEY ARE WATCHING US!","Shh. The walls have ears.","I've been here the longest...","Do not trust the ceiling tiles."],
+  bubble: ["Bloop!","...Bubble.","Bloop bloop!","..."]
+};
+
+const FLOOR_NAMES = ['Basement','Ground Floor','Upper Floor','Rooftop'];
+
+// Zone bounds (x from, x to) — ground floor
+const ZONES = [
+  {name:'Dungeon',     floor:0, col:0x1a0a2e, light:0x3d0c02},
+  {name:'Main Hall',   floor:1, col:0x1a1a3e, light:0x3355ff},
+  {name:'DR Bedroom',  floor:2, col:0x0d0d1a, light:0xffd400},
+  {name:'Fairground',  floor:1, col:0x1a2a1a, light:0xff6b00},
+  {name:'Beach',       floor:1, col:0x0a1a2e, light:0x00b4ff},
+  {name:'Rooftop',     floor:3, col:0x050510, light:0x9400D3}
+];
+
+// ═══════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════
+let scene, camera, renderer, clock;
+let player = {
+  pos: new THREE.Vector3(0, PLAYER_HEIGHT, 0),
+  vel: new THREE.Vector3(),
+  yaw: 0, pitch: 0,
+  onGround: false,
+  flying: false,
+  phasing: false,
+  isLeader: false,
+  gender: 'male',
+  name: 'Player',
+  charId: 'dino',
+  clothesOn: true,
+  skinCol: 0xFFD700,
+  hairCol: 0x9400D3,
+  outfitTop: 0xffd400,
+  outfitBot: 0x4B0082
+};
+let currentFloor = 1;
+let locked = false;
+let npcs = [];
+let otherPlayers = [];
+let rooms = [];
+let myRoom = null;
+let nearNPC = null;
+let keys = {};
+let selectedChar = 'dino';
+let chatMessages = [];
+let gameStarted = false;
+let frameCount = 0;
+let animTime = 0;
+
+// ═══════════════════════════════════════════════════════
+//  OVERLAY LOGIC
+// ═══════════════════════════════════════════════════════
+function buildCharGrid() {
+  const g = document.getElementById('cGrid');
+  CHARACTERS.forEach(ch => {
+    const d = document.createElement('div');
+    d.className = 'cc';
+    d.innerHTML = '<div class="ce">'+ch.emoji+'</div><div class="cn">'+ch.name+'</div>';
+    d.onclick = () => {
+      document.querySelectorAll('.cc').forEach(x=>x.classList.remove('sel'));
+      d.classList.add('sel');
+      selectedChar = ch.id;
+      const info = CHARACTERS.find(c=>c.id===ch.id);
+      document.getElementById('pName').value = ch.name;
+      document.getElementById('pGender').value = info.gender==='nonbinary'?'nonbinary':info.gender;
+    };
+    g.appendChild(d);
+  });
+}
+
+function checkAge() {
+  const v = parseInt(document.getElementById('ageInp').value);
+  if(isNaN(v)||v<13){document.getElementById('ageErr').style.display='block';return;}
+  document.getElementById('ageErr').style.display='none';
+  document.getElementById('scr_age').style.display='none';
+  document.getElementById('scr_char').style.display='flex';
+  buildCharGrid();
+}
+
+function startGame() {
+  const nm = document.getElementById('pName').value.trim()||'Player';
+  const gn = document.getElementById('pGender').value;
+  const sk = document.getElementById('pSkin').value;
+  const hr = document.getElementById('pHair').value;
+  const ch = CHARACTERS.find(c=>c.id===selectedChar)||CHARACTERS[0];
+  player.name = nm;
+  player.gender = gn;
+  player.charId = ch.id;
+  player.isLeader = nm.toLowerCase().includes('dino raptor')||nm.toLowerCase().includes('dinoraptor')||ch.isLeader;
+  player.skinCol = parseInt(sk,16);
+  player.hairCol = parseInt(hr,16);
+  player.outfitTop = ch.outfitTop;
+  player.outfitBot = ch.outfitBot;
+  document.getElementById('hName').textContent = player.isLeader?'👑 '+nm:nm;
+  if(player.isLeader) document.getElementById('pbar').style.display='flex';
+  document.getElementById('overlay').style.display='none';
+  document.getElementById('lockscreen').style.display='flex';
+  initThree();
+  gameStarted = true;
+}
+
+// ═══════════════════════════════════════════════════════
+//  THREE.JS INIT
+// ═══════════════════════════════════════════════════════
+function initThree() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x05000f);
+  scene.fog = new THREE.Fog(0x05000f, 20, 80);
+
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 200);
+  camera.position.copy(player.pos);
+
+  renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  clock = new THREE.Clock();
+
+  buildBuilding();
+  spawnNPCs();
+  spawnOtherPlayers();
+  addAmbient();
+
+  window.addEventListener('resize', ()=>{
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  document.addEventListener('keydown', e=>{
+    keys[e.code]=true;
+    if(e.code==='KeyH'){toggleMenu('amenu');}
+    if(e.code==='KeyM'){toggleMenu('rmenu');refreshRooms();}
+    if(e.code==='KeyE'){tryTalk();}
+    if(e.code==='KeyF'&&player.isLeader){toggleFly();}
+    if(e.code==='KeyT'&&player.isLeader){doTP();}
+    if(e.code==='KeyP'&&player.isLeader){togglePhase();}
+    if(e.code==='KeyR'&&player.isLeader){doReality();}
+    if(e.code==='KeyC'){toggleClothes();}
+    if(e.code==='KeyQ'){changeFloor(1);}
+    if(e.code==='KeyZ'){changeFloor(-1);}
+    if(e.code==='Tab'){e.preventDefault();document.getElementById('cInp').focus();}
+    if(e.code==='Escape'){
+      document.getElementById('amenu').style.display='none';
+      document.getElementById('rmenu').style.display='none';
+      document.getElementById('dlg').style.display='none';
+    }
+  });
+  document.addEventListener('keyup', e=>{keys[e.code]=false;});
+
+  renderer.domElement.addEventListener('click', requestLock);
+  animate();
+}
+
+// ═══════════════════════════════════════════════════════
+//  POINTER LOCK
+// ═══════════════════════════════════════════════════════
+function requestLock() {
+  renderer.domElement.requestPointerLock();
+}
+document.addEventListener('pointerlockchange', ()=>{
+  locked = document.pointerLockElement === renderer.domElement;
+  document.getElementById('lockscreen').style.display = locked?'none':'flex';
+  document.getElementById('cross').style.display = locked?'block':'none';
+});
+document.addEventListener('mousemove', e=>{
+  if(!locked) return;
+  player.yaw   -= e.movementX * 0.002;
+  player.pitch -= e.movementY * 0.002;
+  player.pitch = Math.max(-Math.PI/2+0.05, Math.min(Math.PI/2-0.05, player.pitch));
+});
+
+// ═══════════════════════════════════════════════════════
+//  BUILDING — 4 FLOORS
+// ═══════════════════════════════════════════════════════
+const wallMat  = col => new THREE.MeshLambertMaterial({color:col});
+const floorMats = [0x2a1a3e, 0x1a2a3e, 0x0d1a2e, 0x050510];
+
+// Collision boxes
+let colliders = []; // {min, max} in world space
+
+function addBox(parent, w,h,d, x,y,z, col, cast=true) {
+  const geo = new THREE.BoxGeometry(w,h,d);
+  const mat = new THREE.MeshLambertMaterial({color:col});
+  const m = new THREE.Mesh(geo,mat);
+  m.position.set(x,y,z);
+  m.castShadow=cast; m.receiveShadow=true;
+  parent.add(m);
+  // Register collider
+  colliders.push({
+    min:new THREE.Vector3(x-w/2,y-h/2,z-d/2),
+    max:new THREE.Vector3(x+w/2,y+h/2,z+d/2)
+  });
+  return m;
+}
+
+function addFloor(parent,w,d,x,y,z,col) {
+  const geo=new THREE.BoxGeometry(w,0.3,d);
+  const mat=new THREE.MeshLambertMaterial({color:col});
+  const m=new THREE.Mesh(geo,mat);
+  m.position.set(x,y,z);
+  m.receiveShadow=true;
+  parent.add(m);
+  colliders.push({min:new THREE.Vector3(x-w/2,y-0.15,z-d/2),max:new THREE.Vector3(x+w/2,y+0.15,z+d/2)});
+  return m;
+}
+
+function addWall(parent,w,h,d,x,y,z,col) {
+  const geo=new THREE.BoxGeometry(w,h,d);
+  const mat=new THREE.MeshLambertMaterial({color:col});
+  const m=new THREE.Mesh(geo,mat);
+  m.position.set(x,y,z);
+  m.castShadow=true;m.receiveShadow=true;
+  parent.add(m);
+  colliders.push({min:new THREE.Vector3(x-w/2,y-h/2,z-d/2),max:new THREE.Vector3(x+w/2,y+h/2,z+d/2)});
+  return m;
+}
+
+const stairColliders = []; // stair steps
+
+function addStairs(parent, x, z, floorY) {
+  const steps = 10;
+  const sw=2, sd=0.8, sh=FLOOR_HEIGHT/steps;
+  for(let i=0;i<steps;i++){
+    const sy = floorY + sh*i + sh/2;
+    const sz = z + sd*i;
+    const geo=new THREE.BoxGeometry(sw,sh,sd);
+    const mat=new THREE.MeshLambertMaterial({color:0xc0a050});
+    const m=new THREE.Mesh(geo,mat);
+    m.position.set(x,sy,sz);
+    m.receiveShadow=true;m.castShadow=true;
+    parent.add(m);
+    stairColliders.push({min:new THREE.Vector3(x-sw/2,sy-sh/2,sz-sd/2),max:new THREE.Vector3(x+sw/2,sy+sh/2,sz+sd/2)});
+  }
+}
+
+function buildBuilding() {
+  const root = new THREE.Group();
+  scene.add(root);
+
+  // GROUND outside
+  const geoGround = new THREE.PlaneGeometry(200,200);
+  const matGround = new THREE.MeshLambertMaterial({color:0x0a0a1a});
+  const ground = new THREE.Mesh(geoGround,matGround);
+  ground.rotation.x=-Math.PI/2; ground.position.y=-0.16; ground.receiveShadow=true;
+  scene.add(ground);
+  colliders.push({min:new THREE.Vector3(-100,-0.31,-100),max:new THREE.Vector3(100,0,100)});
+
+  // Sky sphere
+  const skygeo = new THREE.SphereGeometry(150,32,16);
+  const skymat = new THREE.MeshBasicMaterial({color:0x05000f,side:THREE.BackSide});
+  scene.add(new THREE.Mesh(skygeo,skymat));
+
+  // Stars
+  const starGeo = new THREE.BufferGeometry();
+  const starVerts = [];
+  for(let i=0;i<2000;i++){
+    const theta=Math.random()*Math.PI*2, phi=Math.acos(2*Math.random()-1);
+    const r=140;
+    starVerts.push(r*Math.sin(phi)*Math.cos(theta),r*Math.cos(phi),r*Math.sin(phi)*Math.sin(theta));
+  }
+  starGeo.setAttribute('position',new THREE.Float32BufferAttribute(starVerts,3));
+  scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:0.5})));
+
+  // Moon
+  const moon=new THREE.Mesh(new THREE.SphereGeometry(6,16,16),new THREE.MeshBasicMaterial({color:0xf0e8c8}));
+  moon.position.set(-60,80,-100); scene.add(moon);
+
+  const floorW=30, floorD=30;
+
+  for(let fl=0;fl<4;fl++){
+    const fy = fl*FLOOR_HEIGHT;
+    const fc = floorMats[fl];
+    // Floor slab
+    addFloor(root, floorW,floorD, 0,fy,0, fc);
+    // Ceiling (is next floor's bottom)
+    // Outer walls (leave gaps for windows/doors)
+    const wh=FLOOR_HEIGHT, wt=0.4;
+    // North wall
+    addWall(root,floorW,wh,wt, 0,fy+wh/2,-floorD/2, fc===floorMats[0]?0x2a0a3e:0x1a1a4e);
+    // South wall (with door gap on floor 1)
+    if(fl===1){
+      addWall(root,12,wh,wt, -9,fy+wh/2,floorD/2, 0x1a1a4e);
+      addWall(root,12,wh,wt,  9,fy+wh/2,floorD/2, 0x1a1a4e);
+      // Door lintel
+      addWall(root,6,2,wt, 0,fy+wh-1,floorD/2, 0x1a1a4e);
+    } else {
+      addWall(root,floorW,wh,wt, 0,fy+wh/2,floorD/2, 0x1a1a4e);
+    }
+    // East wall
+    addWall(root,wt,wh,floorD, floorW/2,fy+wh/2,0, 0x1a1a4e);
+    // West wall
+    addWall(root,wt,wh,floorD, -floorW/2,fy+wh/2,0, 0x1a1a4e);
+
+    // Interior room dividers — creates rooms within each floor
+    if(fl===1){
+      // Main hall room divider — kitchen wall
+      addWall(root,12,wh,wt, -3,fy+wh/2,5, 0x223344);
+      addWall(root,wt,wh,10, floorW/2-8,fy+wh/2,10, 0x223344);
+    }
+    if(fl===2){
+      // Bedroom dividers
+      addWall(root,floorW,wh,wt, 0,fy+wh/2,2, 0x1a1a3e); // hallway divider
+      addWall(root,wt,wh,12, 0,fy+wh/2,-9, 0x1a1a3e); // split bedrooms
+    }
+
+    // Stairs (south-east corner)
+    addStairs(root, 10, 12+fl*0.5, fy);
+
+    // Floor items (decorative boxes)
+    if(fl===0){
+      // Dungeon items
+      addBox(root,1,2,1, -8,fy+1,8, 0x2a0a0a); // chest
+      addBox(root,0.5,3,0.5, -10,fy+1.5,-10, 0x3a0000); // torch post
+    }
+    if(fl===1){
+      // Main hall — throne
+      addBox(root,2,3,1.5, -5,fy+1.5,-8, 0xffd400);
+      // Gaming PC tower
+      addBox(root,0.8,1.6,0.8, 5,fy+0.8,8, 0x111122);
+      // Monitor
+      addBox(root,1.8,1,0.1, 5,fy+2.2,7.5, 0x222233);
+      // Desk
+      addBox(root,3.5,0.15,1.5, 5,fy+1.5,8, 0x553311);
+      // Couch
+      addBox(root,4,0.8,1.5, -5,fy+0.4,5, 0x8B0000);
+      // TV
+      addBox(root,3,1.8,0.1, -12,fy+2,5, 0x111111);
+    }
+    if(fl===2){
+      // Bedroom — DR room
+      addBox(root,3,0.6,2, -8,fy+0.3,-10, 0x330033); // bed frame
+      addBox(root,3,0.3,2, -8,fy+0.65,-10, 0xff69b4); // mattress
+      // Gaming setup
+      addBox(root,1,1.5,0.8, 5,fy+0.75,9, 0x111122);
+      addBox(root,2,1.2,0.1, 5,fy+2.1,8.5, 0x222233);
+      // Laptop on bed stand
+      addBox(root,1.2,0.05,0.9, -8,fy+1.05,-7, 0x222);
+      addBox(root,1.2,0.8,0.05, -8,fy+1.45,-7.5, 0x333); // screen
+      // PS5 on shelf
+      addBox(root,1.2,0.3,0.4, 8,fy+2.4,9, 0xffffff);
+    }
+    if(fl===3){
+      // Rooftop items
+      addBox(root,0.5,2,0.5, 0,fy+1,0, 0x444455); // antenna
+      addBox(root,1,1,1, 8,fy+0.5,8, 0x334455); // telescope base
+    }
+  }
+
+  // Stair colliders merged into main colliders
+  colliders.push(...stairColliders);
+
+  // Floor labels as glowing planes
+  addRoomLabel(root, 'DUNGEON', 0, 0.5, -13);
+  addRoomLabel(root, 'MAIN HALL', FLOOR_HEIGHT, 0.5, -13);
+  addRoomLabel(root, 'BEDROOMS', FLOOR_HEIGHT*2, 0.5, -13);
+  addRoomLabel(root, 'ROOFTOP', FLOOR_HEIGHT*3, 0.5, -13);
+
+  // Neon sign on rooftop
+  addNeonSign(root, 'DINO RAPTOR', 0,FLOOR_HEIGHT*3+3,-14, 0xffd400);
+
+  // Outside circus tent (far background)
+  buildCircusTent(root);
+}
+
+function addRoomLabel(parent, text, fy, dx, dz) {
+  // placeholder box with slight glow — real text needs canvas texture
+  const canvas = document.createElement('canvas');
+  canvas.width=256;canvas.height=64;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='rgba(0,0,0,0)';ctx.fillRect(0,0,256,64);
+  ctx.fillStyle='#A1C9F4';ctx.font='bold 26px Arial';ctx.textAlign='center';
+  ctx.fillText(text,128,44);
+  const tex=new THREE.CanvasTexture(canvas);
+  const geo=new THREE.PlaneGeometry(8,2);
+  const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide});
+  const m=new THREE.Mesh(geo,mat);
+  m.position.set(dx,fy+FLOOR_HEIGHT-1,dz);
+  parent.add(m);
+}
+
+function addNeonSign(parent, text, x,y,z, col) {
+  const canvas=document.createElement('canvas');
+  canvas.width=512;canvas.height=80;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='rgba(0,0,0,0)';ctx.fillRect(0,0,512,80);
+  ctx.shadowColor='#ffd400';ctx.shadowBlur=18;
+  ctx.fillStyle='#ffd400';ctx.font='bold 48px Arial';ctx.textAlign='center';
+  ctx.fillText(text,256,60);
+  const tex=new THREE.CanvasTexture(canvas);
+  const geo=new THREE.PlaneGeometry(14,2.5);
+  const mat=new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide});
+  const m=new THREE.Mesh(geo,mat);
+  m.position.set(x,y,z);
+  parent.add(m);
+}
+
+function buildCircusTent(parent) {
+  // Striped tent in background
+  const tentGeo=new THREE.ConeGeometry(15,20,16);
+  const tentMat=new THREE.MeshLambertMaterial({color:0xcc2222});
+  const tent=new THREE.Mesh(tentGeo,tentMat);
+  tent.position.set(-40,10,-50);
+  parent.add(tent);
+  // Tent stripe band
+  const bandGeo=new THREE.CylinderGeometry(15.1,15.1,4,16);
+  const bandMat=new THREE.MeshLambertMaterial({color:0xffffff});
+  const band=new THREE.Mesh(bandGeo,bandMat);
+  band.position.set(-40,2,-50);
+  parent.add(band);
+}
+
+// ═══════════════════════════════════════════════════════
+//  CARTOON CHARACTER BUILDER
+// ═══════════════════════════════════════════════════════
+function buildCartoonChar(opts) {
+  // opts: skinCol, hairCol, outfitTop, outfitBot, gender, isLeader, name, clothesOn
+  const root = new THREE.Group();
+  const {skinCol,hairCol,outfitTop,outfitBot,gender,isLeader,clothesOn=true} = opts;
+
+  const skin = new THREE.MeshLambertMaterial({color:skinCol});
+  const hair = new THREE.MeshLambertMaterial({color:hairCol});
+  const topMat = new THREE.MeshLambertMaterial({color:clothesOn?outfitTop:skinCol});
+  const botMat = new THREE.MeshLambertMaterial({color:clothesOn?outfitBot:(gender==='female'?0xFF69B4:0x4169E1)});
+  const white  = new THREE.MeshLambertMaterial({color:0xffffff});
+  const black  = new THREE.MeshLambertMaterial({color:0x111111});
+  const underwearMat = new THREE.MeshLambertMaterial({color:gender==='female'?0xFF69B4:0x4169E1});
+
+  // HEAD
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.55,16,12), skin);
+  head.position.y = 1.55; root.add(head);
+
+  // Hair
+  const hairMesh = new THREE.Mesh(new THREE.SphereGeometry(0.58,16,12), hair);
+  hairMesh.scale.set(1,0.7,1); hairMesh.position.y=1.85; root.add(hairMesh);
+
+  // Eyes (white + pupil)
+  [-0.18,0.18].forEach(ex=>{
+    const eye=new THREE.Mesh(new THREE.SphereGeometry(0.12,8,8),white);
+    eye.position.set(ex,1.58,0.48); root.add(eye);
+    const pupil=new THREE.Mesh(new THREE.SphereGeometry(0.06,8,8),black);
+    pupil.position.set(ex,1.58,0.59); root.add(pupil);
+  });
+
+  // Smile
+  const smileGeo=new THREE.TorusGeometry(0.1,0.02,8,16,Math.PI);
+  const smileMat=new THREE.MeshLambertMaterial({color:0x992222});
+  const smile=new THREE.Mesh(smileGeo,smileMat);
+  smile.rotation.z=Math.PI; smile.position.set(0,1.38,0.52); root.add(smile);
+
+  // BODY (torso)
+  const torso=new THREE.Mesh(new THREE.BoxGeometry(0.7,0.8,0.4),topMat);
+  torso.position.y=0.95; root.add(torso);
+
+  // Breasts (female only — physics driven)
+  let breastL=null, breastR=null;
+  if(gender==='female'){
+    const bsize = clothesOn?0.14:0.18;
+    const bMat = clothesOn?topMat:skin;
+    breastL=new THREE.Mesh(new THREE.SphereGeometry(bsize,10,10),bMat);
+    breastL.position.set(-0.2,0.98,0.22); root.add(breastL);
+    breastR=new THREE.Mesh(new THREE.SphereGeometry(bsize,10,10),bMat);
+    breastR.position.set( 0.2,0.98,0.22); root.add(breastR);
+  }
+
+  // LEGS — underwear or pants
+  const legMat = clothesOn?botMat:underwearMat;
+  const legL=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.7,0.3),legMat);
+  legL.position.set(-0.18,0.35,0); root.add(legL);
+  const legR=new THREE.Mesh(new THREE.BoxGeometry(0.28,0.7,0.3),legMat);
+  legR.position.set( 0.18,0.35,0); root.add(legR);
+
+  // FEET
+  const footMat=new THREE.MeshLambertMaterial({color:0x333333});
+  [-0.18,0.18].forEach(fx=>{
+    const foot=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.12,0.4),footMat);
+    foot.position.set(fx,0.0,0.05); root.add(foot);
+  });
+
+  // ARMS
+  const armL=new THREE.Mesh(new THREE.BoxGeometry(0.22,0.7,0.22),topMat);
+  armL.position.set(-0.48,0.9,0); root.add(armL);
+  const armR=new THREE.Mesh(new THREE.BoxGeometry(0.22,0.7,0.22),topMat);
+  armR.position.set( 0.48,0.9,0); root.add(armR);
+
+  // Crown for Dino Raptor / leader
+  if(isLeader){
+    const crownGeo=new THREE.CylinderGeometry(0.35,0.4,0.25,6);
+    const crownMat=new THREE.MeshLambertMaterial({color:0xffd400});
+    const crown=new THREE.Mesh(crownGeo,crownMat);
+    crown.position.set(0,2.18,0); root.add(crown);
+    // Crown spikes
+    for(let i=0;i<6;i++){
+      const ang=i/6*Math.PI*2;
+      const spike=new THREE.Mesh(new THREE.ConeGeometry(0.06,0.2,6),crownMat);
+      spike.position.set(Math.cos(ang)*0.32,2.35,Math.sin(ang)*0.32);
+      root.add(spike);
+    }
+    // Wings
+    const wingShape=new THREE.Shape();
+    wingShape.moveTo(0,0);wingShape.lineTo(2,1);wingShape.lineTo(1.5,0);wingShape.lineTo(2,-0.5);wingShape.lineTo(0,0);
+    const wingGeo=new THREE.ShapeGeometry(wingShape);
+    const wingMat=new THREE.MeshLambertMaterial({color:0x9400D3,side:THREE.DoubleSide});
+    const wingL=new THREE.Mesh(wingGeo,wingMat); wingL.position.set(-0.35,1.1,0); root.add(wingL);
+    const wingR=new THREE.Mesh(wingGeo,wingMat); wingR.rotation.y=Math.PI; wingR.position.set(0.35,1.1,0); root.add(wingR);
+  }
+
+  // Name tag (canvas texture)
+  const nameCanvas=document.createElement('canvas');
+  nameCanvas.width=200;nameCanvas.height=40;
+  const ctx=nameCanvas.getContext('2d');
+  ctx.fillStyle='rgba(0,0,0,.7)';ctx.fillRect(0,0,200,40);
+  ctx.fillStyle=isLeader?'#ffd400':'#A1C9F4';ctx.font='bold 18px Arial';ctx.textAlign='center';
+  ctx.fillText(opts.name||'',100,27);
+  const nameTex=new THREE.CanvasTexture(nameCanvas);
+  const nameGeo=new THREE.PlaneGeometry(1.8,0.4);
+  const nameMat2=new THREE.MeshBasicMaterial({map:nameTex,transparent:true,side:THREE.DoubleSide,depthWrite:false});
+  const nameTag=new THREE.Mesh(nameGeo,nameMat2);
+  nameTag.position.y=2.5; nameTag.renderOrder=1; root.add(nameTag);
+
+  return {mesh:root, legL, legR, armL, armR, breastL, breastR,
+          breastVelY:0, breastVelX:0, breastBaseY:gender==='female'?0.98:0,
+          clothesOn:clothesOn, gender, prevY:0};
+}
+
+// ═══════════════════════════════════════════════════════
+//  SPAWN NPCs
+// ═══════════════════════════════════════════════════════
+function spawnNPCs() {
+  const npcData = [
+    {id:'pomni',  x:-5,  z:-5,  floor:1, patrolX:[-8,-2], zone:'Main Hall'},
+    {id:'ragatha',x: 8,  z: 3,  floor:1, patrolX:[4,12],  zone:'Main Hall'},
+    {id:'jax',    x:-5,  z: 5,  floor:0, patrolX:[-8,-2], zone:'Dungeon'},
+    {id:'gangle', x: 5,  z:-10, floor:2, patrolX:[2,10],  zone:'Upper Floor'},
+    {id:'zooble', x:-8,  z: 8,  floor:1, patrolX:[-12,-4],zone:'Main Hall'},
+    {id:'kinger', x: 3,  z: 3,  floor:2, patrolX:[0,8],   zone:'Upper Floor'},
+    {id:'bubble', x: 0,  z:-5,  floor:1, patrolX:[-3,3],  zone:'Main Hall'}
+  ];
+
+  npcData.forEach(d=>{
+    const ch=CHARACTERS.find(c=>c.id===d.id);
+    const built=buildCartoonChar({
+      skinCol:ch.skinCol, hairCol:ch.hairCol,
+      outfitTop:ch.outfitTop, outfitBot:ch.outfitBot,
+      gender:ch.gender, isLeader:false, name:ch.name, clothesOn:true
+    });
+    const fy = d.floor*FLOOR_HEIGHT;
+    built.mesh.position.set(d.x, fy+PLAYER_HEIGHT, d.z);
+    scene.add(built.mesh);
+
+    const light=new THREE.PointLight(0xffffff,0.4,5);
+    built.mesh.add(light); light.position.y=1;
+
+    npcs.push({
+      id:d.id, name:ch.name, char:built,
+      pos:new THREE.Vector3(d.x,fy+PLAYER_HEIGHT,d.z),
+      floor:d.floor, patrolX:d.patrolX, patrolDir:1,
+      patrolSpeed:1.2, zone:d.zone,
+      dialogues:NPC_DIALOGUES[d.id]||['...'],
+      dialogIdx:0
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  SPAWN OTHER PLAYERS (simulated)
+// ═══════════════════════════════════════════════════════
+function spawnOtherPlayers() {
+  const others=[
+    {name:'CoolPlayer99',  charId:'pomni',   gender:'female', floor:1, x:6,z:-6},
+    {name:'PS5User',       charId:'ragatha', gender:'female', floor:2, x:-6,z:-8},
+    {name:'VoidWalker',    charId:'jax',     gender:'male',   floor:0, x:4,z:6}
+  ];
+  others.forEach(d=>{
+    const ch=CHARACTERS.find(c=>c.id===d.charId);
+    const built=buildCartoonChar({
+      skinCol:ch.skinCol,hairCol:ch.hairCol,
+      outfitTop:ch.outfitTop,outfitBot:ch.outfitBot,
+      gender:d.gender,isLeader:false,name:d.name,clothesOn:true
+    });
+    const fy=d.floor*FLOOR_HEIGHT;
+    built.mesh.position.set(d.x,fy+PLAYER_HEIGHT,d.z);
+    scene.add(built.mesh);
+    otherPlayers.push({name:d.name,char:built,
+      pos:new THREE.Vector3(d.x,fy+PLAYER_HEIGHT,d.z),
+      floor:d.floor,moveTimer:0,moveDir:new THREE.Vector3(Math.random()-.5,0,Math.random()-.5).normalize()});
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  AMBIENT LIGHT
+// ═══════════════════════════════════════════════════════
+function addAmbient(){
+  scene.add(new THREE.AmbientLight(0x202040,1));
+  const sun=new THREE.DirectionalLight(0x8888ff,0.8);
+  sun.position.set(20,50,20); sun.castShadow=true; scene.add(sun);
+  // Floor lights
+  [0,1,2,3].forEach(fl=>{
+    const pl=new THREE.PointLight(0xA1C9F4,0.6,20);
+    pl.position.set(0,fl*FLOOR_HEIGHT+5,0); scene.add(pl);
+    const pl2=new THREE.PointLight(0xffd400,0.3,15);
+    pl2.position.set(-10,fl*FLOOR_HEIGHT+5,0); scene.add(pl2);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  PLAYER MESH (first person — just shadow)
+// ═══════════════════════════════════════════════════════
+let playerShadow;
+function buildPlayerShadow(){
+  const geo=new THREE.CylinderGeometry(0.4,0.4,0.1,12);
+  const mat=new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.35});
+  playerShadow=new THREE.Mesh(geo,mat); scene.add(playerShadow);
+}
+buildPlayerShadow();
+
+// ═══════════════════════════════════════════════════════
+//  COLLISION HELPERS
+// ═══════════════════════════════════════════════════════
+function getGroundY(x,z) {
+  // Find highest floor slab below player
+  let best = -999;
+  for(const c of colliders){
+    if(x>=c.min.x-0.3 && x<=c.max.x+0.3 && z>=c.min.z-0.3 && z<=c.max.z+0.3){
+      const top=c.max.y;
+      if(top<=player.pos.y+0.5 && top>best) best=top;
+    }
+  }
+  return best===-999?-1:best;
+}
+
+function checkWallCollision(newPos){
+  if(player.phasing) return newPos;
+  const r=0.4, ey=0.1;
+  for(const c of colliders){
+    // Skip floor/ceiling slabs (thin ones)
+    if((c.max.y-c.min.y)<1) continue;
+    const cx=(c.min.x+c.max.x)/2, cz=(c.min.z+c.max.z)/2;
+    const hw=(c.max.x-c.min.x)/2+r, hd=(c.max.z-c.min.z)/2+r;
+    const vertOk = newPos.y+ey < c.max.y && newPos.y+PLAYER_HEIGHT > c.min.y;
+    if(!vertOk) continue;
+    const dx=newPos.x-cx, dz=newPos.z-cz;
+    if(Math.abs(dx)<hw && Math.abs(dz)<hd){
+      // Push out along smallest axis
+      const ox=hw-Math.abs(dx), oz=hd-Math.abs(dz);
+      if(ox<oz) newPos.x+=dx>0?ox:-ox;
+      else      newPos.z+=dz>0?oz:-oz;
+    }
+  }
+  return newPos;
+}
+
+// ═══════════════════════════════════════════════════════
+//  PHYSICS & MOVEMENT
+// ═══════════════════════════════════════════════════════
+const _fwd=new THREE.Vector3(), _right=new THREE.Vector3(), _move=new THREE.Vector3();
+function updatePlayer(dt){
+  // Direction from yaw only
+  _fwd.set(Math.sin(player.yaw),0,Math.cos(player.yaw));
+  _right.set(Math.cos(player.yaw),0,-Math.sin(player.yaw));
+  _move.set(0,0,0);
+  if(keys['KeyW']||keys['ArrowUp'])    _move.addScaledVector(_fwd,-1);
+  if(keys['KeyS']||keys['ArrowDown'])  _move.addScaledVector(_fwd, 1);
+  if(keys['KeyA']||keys['ArrowLeft'])  _move.addScaledVector(_right,-1);
+  if(keys['KeyD']||keys['ArrowRight']) _move.addScaledVector(_right, 1);
+  if(_move.length()>0) _move.normalize().multiplyScalar(MOVE_SPEED*dt);
+
+  if(player.flying){
+    _move.y = 0;
+    if(keys['Space']) _move.y += MOVE_SPEED*dt*0.8;
+    if(keys['ShiftLeft']) _move.y -= MOVE_SPEED*dt*0.8;
+    player.vel.set(0,0,0);
+    player.pos.add(_move);
+  } else {
+    player.vel.y += GRAVITY*dt;
+    player.pos.add(_move);
+    player.pos.y += player.vel.y*dt;
+
+    const gy = getGroundY(player.pos.x, player.pos.z);
+    const groundLevel = gy+PLAYER_HEIGHT;
+    if(player.pos.y <= groundLevel){
+      player.pos.y = groundLevel;
+      player.vel.y = 0;
+      player.onGround = true;
+    } else {
+      player.onGround = false;
+    }
+
+    if((keys['Space'])&&player.onGround){
+      player.vel.y = JUMP_SPEED;
+      player.onGround=false;
+    }
+  }
+
+  // Wall collision
+  const np=checkWallCollision(player.pos.clone());
+  player.pos.copy(np);
+
+  // Clamp to world
+  player.pos.x=Math.max(-14,Math.min(14,player.pos.x));
+  player.pos.z=Math.max(-14,Math.min(14,player.pos.z));
+  player.pos.y=Math.max(-1,player.pos.y);
+
+  // Current floor
+  currentFloor=Math.max(0,Math.min(3,Math.round((player.pos.y-PLAYER_HEIGHT)/FLOOR_HEIGHT)));
+
+  // Camera
+  camera.position.copy(player.pos).add(new THREE.Vector3(0,0.6,0));
+  camera.rotation.order='YXZ';
+  camera.rotation.y=player.yaw;
+  camera.rotation.x=player.pitch;
+
+  // Shadow
+  playerShadow.position.set(player.pos.x, getGroundY(player.pos.x,player.pos.z)+0.06, player.pos.z);
+
+  // HUD
+  document.getElementById('hFloor').textContent=currentFloor;
+  const zoneName=FLOOR_NAMES[currentFloor]||'???';
+  document.getElementById('hZone').textContent=zoneName;
+  document.getElementById('zlbl').textContent=zoneName.toUpperCase();
+}
+
+// ═══════════════════════════════════════════════════════
+//  NPC UPDATE — patrol own zone only
+// ═══════════════════════════════════════════════════════
+function updateNPCs(dt){
+  npcs.forEach(npc=>{
+    const fy=npc.floor*FLOOR_HEIGHT;
+    // Patrol on X axis within patrolX bounds
+    npc.pos.x += npc.patrolDir * npc.patrolSpeed * dt;
+    if(npc.pos.x > npc.patrolX[1]) npc.patrolDir=-1;
+    if(npc.pos.x < npc.patrolX[0]) npc.patrolDir= 1;
+
+    // Stay on floor
+    const gy=getGroundY(npc.pos.x, npc.pos.z);
+    npc.pos.y=gy>-900?gy+PLAYER_HEIGHT:fy+PLAYER_HEIGHT;
+
+    npc.char.mesh.position.copy(npc.pos);
+    // Face patrol direction
+    npc.char.mesh.rotation.y = npc.patrolDir>0?0:Math.PI;
+
+    // Leg walk animation
+    const legSwing=Math.sin(animTime*4)*0.4;
+    if(npc.char.legL) npc.char.legL.rotation.x= legSwing;
+    if(npc.char.legR) npc.char.legR.rotation.x=-legSwing;
+
+    // Breast physics for female NPCs
+    updateBreastPhysics(npc.char, npc.patrolDir*npc.patrolSpeed, dt);
+
+    // Name tag always faces camera
+    const tag=npc.char.mesh.children.find(c=>c.material&&c.material.map instanceof THREE.CanvasTexture);
+    if(tag) tag.rotation.y=Math.atan2(camera.position.x-npc.pos.x,camera.position.z-npc.pos.z)-npc.char.mesh.rotation.y;
+
+    // Check proximity for interact hint
+    const dist=player.pos.distanceTo(npc.pos);
+    if(dist<2.5){nearNPC=npc;document.getElementById('hint').style.display='block';}
+  });
+  if(!npcs.some(n=>player.pos.distanceTo(n.pos)<2.5)){
+    nearNPC=null;document.getElementById('hint').style.display='none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+//  BREAST PHYSICS
+// ═══════════════════════════════════════════════════════
+function updateBreastPhysics(ch, speed, dt){
+  if(ch.gender!=='female') return;
+  if(!ch.breastL||!ch.breastR) return;
+  // Oscillate based on movement speed
+  const accel = Math.abs(speed)*2;
+  const freq  = 8; // bounce frequency
+  const damp  = 0.85;
+  ch.breastVelY += (-ch.breastVelY*5 + Math.sin(animTime*freq)*accel)*dt*10;
+  ch.breastVelY *= damp;
+  ch.breastVelX += (-ch.breastVelX*5 + Math.cos(animTime*freq*0.7)*accel*0.4)*dt*10;
+  ch.breastVelX *= damp;
+
+  const baseY = ch.breastBaseY;
+  const offsetY = ch.breastVelY*0.03;
+  const offsetX = ch.breastVelX*0.015;
+
+  ch.breastL.position.set(-0.2+offsetX, baseY+offsetY, 0.22);
+  ch.breastR.position.set( 0.2-offsetX, baseY+offsetY, 0.22);
+}
+
+// ═══════════════════════════════════════════════════════
+//  OTHER PLAYERS UPDATE
+// ═══════════════════════════════════════════════════════
+function updateOtherPlayers(dt){
+  otherPlayers.forEach(op=>{
+    op.moveTimer+=dt;
+    if(op.moveTimer>3){
+      op.moveDir.set(Math.random()-.5,0,Math.random()-.5).normalize();
+      op.moveTimer=0;
+    }
+    op.pos.addScaledVector(op.moveDir, 2*dt);
+    op.pos.x=Math.max(-12,Math.min(12,op.pos.x));
+    op.pos.z=Math.max(-12,Math.min(12,op.pos.z));
+    const gy=getGroundY(op.pos.x,op.pos.z);
+    op.pos.y=gy>-900?gy+PLAYER_HEIGHT:op.floor*FLOOR_HEIGHT+PLAYER_HEIGHT;
+    op.char.mesh.position.copy(op.pos);
+    op.char.mesh.rotation.y=Math.atan2(op.moveDir.x,op.moveDir.z);
+    // Walk anim
+    const sw=Math.sin(animTime*5)*0.4;
+    if(op.char.legL) op.char.legL.rotation.x= sw;
+    if(op.char.legR) op.char.legR.rotation.x=-sw;
+    updateBreastPhysics(op.char, 2, dt);
+    // Name tag faces camera
+    const tag=op.char.mesh.children.find(c=>c.material&&c.material.map instanceof THREE.CanvasTexture);
+    if(tag) tag.rotation.y=Math.atan2(camera.position.x-op.pos.x,camera.position.z-op.pos.z)-op.char.mesh.rotation.y;
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+//  MINIMAP
+// ═══════════════════════════════════════════════════════
+function drawMinimap(){
+  const mc=document.getElementById('mmc');
+  const ctx=mc.getContext('2d');
+  ctx.clearRect(0,0,130,90);
+  ctx.fillStyle='rgba(5,0,15,.85)';ctx.fillRect(0,0,130,90);
+  // Scale: world -15..15 → 0..130 x, -15..15 → 0..90 y
+  const wx=v=>((v+15)/30)*130;
+  const wz=v=>((v+15)/30)*90;
+  // Floor rooms outline
+  ctx.strokeStyle='#333';ctx.lineWidth=1;
+  ctx.strokeRect(wx(-15),wz(-15),130,90);
+  ctx.strokeStyle='#A1C9F440';
+  ctx.strokeRect(wx(-14.9),wz(-14.9),128,88);
+  // NPCs — show only current floor
+  npcs.filter(n=>n.floor===currentFloor).forEach(n=>{
+    ctx.fillStyle='#8DE5A1';
+    ctx.beginPath();ctx.arc(wx(n.pos.x),wz(n.pos.z),3,0,Math.PI*2);ctx.fill();
+  });
+  // Other players — show only current floor
+  otherPlayers.filter(op=>op.floor===currentFloor).forEach(op=>{
+    ctx.fillStyle='#A1C9F4';
+    ctx.beginPath();ctx.arc(wx(op.pos.x),wz(op.pos.z),3,0,Math.PI*2);ctx.fill();
+  });
+  // Player (always)
+  ctx.fillStyle='#ffd400';
+  ctx.beginPath();ctx.arc(wx(player.pos.x),wz(player.pos.z),4,0,Math.PI*2);ctx.fill();
+  // Direction indicator
+  ctx.strokeStyle='#ffd400';ctx.lineWidth=1.5;
+  ctx.beginPath();
+  ctx.moveTo(wx(player.pos.x),wz(player.pos.z));
+  ctx.lineTo(wx(player.pos.x+Math.sin(player.yaw)*3),wz(player.pos.z+Math.cos(player.yaw)*3));
+  ctx.stroke();
+  document.getElementById('mmLbl').textContent='Floor '+currentFloor+' — '+FLOOR_NAMES[currentFloor];
+}
+
+// ═══════════════════════════════════════════════════════
+//  INTERACT & TALK
+// ═══════════════════════════════════════════════════════
+function tryTalk(){
+  if(!nearNPC) return;
+  const n=nearNPC;
+  const line=n.dialogues[n.dialogIdx%n.dialogues.length];
+  n.dialogIdx++;
+  document.getElementById('dlgSpk').textContent=n.name;
+  document.getElementById('dlgTxt').textContent=line;
+  document.getElementById('dlg').style.display='block';
+  document.exitPointerLock();
+}
+function closeDlg(){document.getElementById('dlg').style.display='none';}
+
+// ═══════════════════════════════════════════════════════
+//  CLOTHES TOGGLE
+// ═══════════════════════════════════════════════════════
+function toggleClothes(){
+  player.clothesOn=!player.clothesOn;
+  addChat('System','You '+(player.clothesOn?'put on':'took off')+' your clothes.');
+}
+
+// ═══════════════════════════════════════════════════════
+//  DINO RAPTOR POWERS
+// ═══════════════════════════════════════════════════════
+function toggleFly(){
+  if(!player.isLeader) return;
+  player.flying=!player.flying; player.vel.y=0;
+  addChat('System',player.flying?'✈ Flying mode ON':'✈ Flying mode OFF');
+}
+function doTP(){
+  if(!player.isLeader) return;
+  const zone=ZONES[Math.floor(Math.random()*ZONES.length)];
+  player.pos.set(0,zone.floor*FLOOR_HEIGHT+PLAYER_HEIGHT,0);
+  player.vel.set(0,0,0);
+  showFloorIndicator('⚡ Teleported to '+zone.name+'!');
+}
+function togglePhase(){
+  if(!player.isLeader) return;
+  player.phasing=!player.phasing;
+  addChat('System',player.phasing?'👻 Phase mode ON (walk through walls)':'👻 Phase mode OFF');
+}
+function doReality(){
+  if(!player.isLeader) return;
+  const cols=[0x05000f,0x0a001a,0x001a0a,0x1a0000];
+  scene.background=new THREE.Color(cols[Math.floor(Math.random()*cols.length)]);
+  addChat('System','🌍 Reality shifted!');
+}
+
+// ═══════════════════════════════════════════════════════
+//  FLOOR CHANGE
+// ═══════════════════════════════════════════════════════
+function changeFloor(dir){
+  const newFloor=Math.max(0,Math.min(3,currentFloor+dir));
+  if(newFloor===currentFloor) return;
+  currentFloor=newFloor;
+  player.pos.y=newFloor*FLOOR_HEIGHT+PLAYER_HEIGHT+0.5;
+  player.vel.y=0;
+  showFloorIndicator('Floor '+newFloor+': '+FLOOR_NAMES[newFloor]);
+}
+
+function showFloorIndicator(text){
+  const el=document.getElementById('flind');
+  el.textContent=text; el.style.display='block';
+  clearTimeout(window._flTimer);
+  window._flTimer=setTimeout(()=>{el.style.display='none';},2000);
+}
+
+// ═══════════════════════════════════════════════════════
+//  MENUS
+// ═══════════════════════════════════════════════════════
+function toggleMenu(id){
+  const el=document.getElementById(id);
+  const vis=el.style.display==='none'||!el.style.display||el.style.display==='';
+  el.style.display=vis?'block':'none';
+  if(vis) document.exitPointerLock();
+}
+function closeMenu(id){document.getElementById(id).style.display='none';}
+
+function doAct(act){
+  const msgs={sleep:'😴 You fell asleep... zzz',eat:'🍔 Yum! You ate a burger.',drink:'💧 Refreshing!',
+    alcohol:'🍺 *hic* You feel tipsy...',smoke:'🚬 You lit a cigarette.',vape:'💨 Vape clouds everywhere.',
+    pc:'🖥 You opened Digital Circus Online on your PC.',ps5:'🎮 PS5 booted up!',
+    laptop:'💻 Laptop ready for chatting.',phone:'📱 You checked your phone.',
+    shower:'🚿 Squeaky clean!',gun:'🔫 You holstered your gun.'};
+  addChat('System',msgs[act]||act); closeMenu('amenu');
+}
+
+// ═══════════════════════════════════════════════════════
+//  MULTIPLAYER ROOMS
+// ═══════════════════════════════════════════════════════
+const _rooms=[
+  {id:'r1',name:'Throne Room HQ',zone:'Main Hall',priv:false,players:['Dino Raptor'],max:16},
+  {id:'r2',name:'Beach Party',zone:'Beach',priv:false,players:['Zooble'],max:16},
+  {id:'r3',name:'Void Club',zone:'Void',priv:true,code:'I1XTKU',players:['Jax','Gangle'],max:8}
+];
+function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+function refreshRooms(){
+  const el=document.getElementById('rList');
+  el.innerHTML=_rooms.filter(r=>!r.priv).map(r=>
+    '<div style="background:#1a1a2e;border:1px solid #333;border-radius:7px;padding:6px 8px;margin-bottom:5px;font-size:11px">'+
+    '<b style="color:#A1C9F4">'+r.name+'</b> <span style="color:#909094">'+r.zone+'</span> '+
+    '<span style="color:#8DE5A1">'+r.players.length+'/'+r.max+'</span> '+
+    '<button onclick="joinRoom(\''+r.id+'\')" style="float:right;background:#1F77B4;color:#fff;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:10px">Join</button></div>'
+  ).join('');
+}
+function createRoom(){
+  const nm=document.getElementById('rNameInp').value.trim()||'My Room';
+  const zn=document.getElementById('rZoneInp').value;
+  const priv=document.getElementById('rPriv').checked;
+  const code=priv?genCode():null;
+  const r={id:'r'+Date.now(),name:nm,zone:zn,priv,code,players:[player.name],max:16};
+  _rooms.push(r); myRoom=r;
+  if(priv){document.getElementById('cpopCode').textContent=code;document.getElementById('cpop').style.display='block';}
+  else{addChat('System','Room "'+nm+'" created!');}
+  refreshRooms();
+}
+function joinRoom(id){
+  const r=_rooms.find(x=>x.id===id);
+  if(!r) return;
+  if(!r.players.includes(player.name)) r.players.push(player.name);
+  myRoom=r; addChat('System','Joined "'+r.name+'"!');
+}
+function joinWithCode(){
+  const code=document.getElementById('rCodeInp').value.trim().toUpperCase();
+  const r=_rooms.find(x=>x.priv&&x.code===code);
+  if(!r){addChat('System','Wrong code! Ask the host.');return;}
+  if(!r.players.includes(player.name)) r.players.push(player.name);
+  myRoom=r; addChat('System','Joined private room "'+r.name+'"!');
+}
+
+// ═══════════════════════════════════════════════════════
+//  CHAT
+// ═══════════════════════════════════════════════════════
+const FILTER=['fuck','shit','bitch','cunt','ass','damn','bastard','dick','cock'];
+function filterText(t){
+  let r=t;
+  FILTER.forEach(w=>{const re=new RegExp(w,'gi');r=r.replace(re,'*'.repeat(w.length));});
+  // no middle finger emoji either
+  r=r.replace(/🖕/g,'👋');
+  return r;
+}
+function addChat(name,msg,col){
+  chatMessages.push({name,msg:filterText(msg),col:col||'#fbfbff',time:new Date().toLocaleTimeString('nl',{hour:'2-digit',minute:'2-digit'})});
+  if(chatMessages.length>50) chatMessages.shift();
+  const el=document.getElementById('clog');
+  el.innerHTML=chatMessages.map(m=>'<div><span style="color:#909094;font-size:9px">'+m.time+'</span> <span style="color:'+(m.name==='System'?'#ffd400':m.name===player.name?'#8DE5A1':'#A1C9F4')+';font-weight:bold">'+m.name+':</span> <span style="color:'+m.col+'">'+m.msg+'</span></div>').join('');
+  el.scrollTop=el.scrollHeight;
+}
+function sendChat(){
+  const inp=document.getElementById('cInp');
+  const txt=inp.value.trim(); if(!txt) return;
+  addChat(player.name,txt); inp.value='';
+  // NPC random response
+  if(nearNPC && Math.random()<0.4){
+    setTimeout(()=>{
+      const line=nearNPC.dialogues[Math.floor(Math.random()*nearNPC.dialogues.length)];
+      addChat(nearNPC.name,line,'#FFB482');
+    },800);
+  }
+}
+
+// Init chat
+setTimeout(()=>{
+  addChat('System','Welcome to the Amazing Digital Circus 3D!');
+  addChat('Ragatha','Hi there, stay positive!');
+  addChat('Jax','Whatever.');
+},500);
+
+// ═══════════════════════════════════════════════════════
+//  MAIN LOOP
+// ═══════════════════════════════════════════════════════
+function animate(){
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(),0.05);
+  animTime+=dt;
+  if(!gameStarted) return;
+  updatePlayer(dt);
+  updateNPCs(dt);
+  updateOtherPlayers(dt);
+  drawMinimap();
+  renderer.render(scene,camera);
+  frameCount++;
+}
+</script>
+</body>
+</html>
